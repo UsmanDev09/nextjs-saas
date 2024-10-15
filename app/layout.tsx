@@ -19,8 +19,8 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Provider>
-          <main className="h-screen flex flex-col justify-center items-center">
-            <Navbar />
+          <main >
+            {/* <Navbar /> */}
             {children}
           </main>
           <Toaster />

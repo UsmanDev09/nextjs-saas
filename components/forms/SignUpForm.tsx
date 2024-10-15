@@ -1,159 +1,165 @@
-'use client';
+'use client'
+import Link from 'next/link'
+import { useState } from 'react'
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
+import axios from 'axios'
+import { EnvelopeIcon, EyeIcon, EyeSlashIcon, LockClosedIcon } from '@heroicons/react/24/outline'
+import LinkedInSvg from '../svgs/linkedInSvg'
+import GoogleSvg from '../svgs/googleSvg'
+import FacebookSvg from '../svgs/facebookSvg'
+import GoogleSignInButton from '../GoogleSignInButton'
+import FacebookSignInButton from '../FacebookSignInButton'
 
-import { useForm } from 'react-hook-form';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '../ui/form';
-import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
-import Link from 'next/link';
-import GoogleSignInButton from '../GoogleSignInButton';
-import { useRouter } from 'next/navigation';
-import { useToast } from "@/hooks/use-toast";
-import FacebookSignInButton from '../FacebookSignInButton';
+const validationSchema = Yup.object({
+  email: Yup.string().email('Invalid email address').required('Required'),
+  password: Yup.string().min(8, 'Must be at least 8 characters').required('Required'),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref('password')], 'Passwords must match')
+    .required('Required'),
+})
 
-const FormSchema = z
-  .object({
-    email: z.string().min(1, 'Email is required').email('Invalid email'),
-    password: z
-      .string()
-      .min(1, 'Password is required')
-      .min(8, 'Password must have at least 8 characters'),
-    confirmPassword: z.string().min(1, 'Password confirmation is required'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    path: ['confirmPassword'],
-    message: 'Passwords do not match',
-  });
+export default function SignUpPage() {
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-const SignUpForm = () => {
-  const { toast } = useToast();
-  const router = useRouter();
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
+  const formik = useFormik({
+    initialValues: {
       email: '',
       password: '',
       confirmPassword: '',
     },
-  });
-
-  const onSubmit = async (values: z.infer<typeof FormSchema>) => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sign-up`, {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
+    validationSchema: validationSchema,
+    onSubmit: async (values) => {
+      try {
+        const response = await axios.post('/api/sign-up', {
           email: values.email,
           password: values.password,
-          confirmPassword: values.confirmPassword,
+          confirmPassword:values.confirmPassword,
         })
-      });
-      
-      if (response.ok) {
-        toast({
-          title: "Sign Up Successful",
-          description: "Your account has been created. Please sign in."
-        });
-        router.push('/sign-in');
-      } else {
-        const errorData = await response.json();
-        toast({
-          title: "Error",
-          description: errorData.message || "An error occurred during sign-up.",
-          variant: "destructive"
-        });
+        console.log('Sign up successful:', response.data)
+      } catch (error:any) {
+        console.error('Sign up failed:', error.response?.data || error.message)
       }
-    } catch (error) {
-      console.error('Sign-Up Error:', error);
-      toast({
-        title: "Unexpected Error",
-        description: "Something went wrong. Please try again later.",
-        variant: "destructive"
-      });
-    }
-  };
+    },
+  })
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='w-full'>
-        <div className='space-y-2'>
-          <FormField
-            control={form.control}
-            name='email'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder='mail@example.com' {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='password'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input
-                    type='password'
-                    placeholder='Enter your password'
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='confirmPassword'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Re-Enter your password</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder='Re-Enter your password'
-                    type='password'
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+    <div className="min-h-screen bg-purple-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md">
+        <div className="flex justify-center mb-6">
+          <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center">
+            <span className="text-white text-2xl font-bold">S</span>
+          </div>
         </div>
-        <Button className='w-full mt-6' type='submit'>
-          Sign up
-        </Button>
-      </form>
-      <div className='mx-auto my-4 flex w-full items-center justify-evenly before:mr-4 before:block before:h-px before:flex-grow before:bg-stone-400 after:ml-4 after:block after:h-px after:flex-grow after:bg-stone-400'>
-        or
+        <h1 className="text-3xl font-bold text-center mb-2">Get Started</h1>
+        <p className="text-gray-500 text-center mb-8">
+          Ready to skill up? SaaS awaits.<br />
+          Let's make awesome things!
+        </p>
+        <form onSubmit={formik.handleSubmit} className="space-y-4">
+          <div className="relative">
+            <EnvelopeIcon className="w-6 h-6 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+            <input
+              type="email"
+              // name="email"
+              placeholder="Your email"
+              className={`w-full pl-12 pr-4 py-3 rounded-xl border ${
+                formik.touched.email && formik.errors.email ? 'border-red-500' : 'border-gray-300'
+              } focus:outline-none focus:ring-2 focus:ring-purple-500`}
+              {...formik.getFieldProps('email')}
+            />
+            {formik.touched.email && formik.errors.email && (
+              <div className="text-red-500 text-sm mt-1">{formik.errors.email}</div>
+            )}
+          </div>
+          <div className="relative">
+            <LockClosedIcon className="w-6 h-6 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+            <input
+              type={showPassword ? "text" : "password"}
+              // name="password"
+              placeholder="Password"
+              className={`w-full pl-12 pr-12 py-3 rounded-xl border ${
+                formik.touched.password && formik.errors.password ? 'border-red-500' : 'border-gray-300'
+              } focus:outline-none focus:ring-2 focus:ring-purple-500`}
+              {...formik.getFieldProps('password')}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2"
+            >
+              {showPassword ? (
+                <EyeSlashIcon className="w-6 h-6 text-gray-400" />
+              ) : (
+                <EyeIcon className="w-6 h-6 text-gray-400" />
+              )}
+            </button>
+            {formik.touched.password && formik.errors.password && (
+              <div className="text-red-500 text-sm mt-1">{formik.errors.password}</div>
+            )}
+          </div>
+          <div className="relative">
+            <LockClosedIcon className="w-6 h-6 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              // name="confirmPassword"
+              placeholder="Confirm your password"
+              className={`w-full pl-12 pr-12 py-3 rounded-xl border ${
+                formik.touched.confirmPassword && formik.errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+              } focus:outline-none focus:ring-2 focus:ring-purple-500`}
+              {...formik.getFieldProps('confirmPassword')}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2"
+            >
+              {showConfirmPassword ? (
+                <EyeSlashIcon className="w-6 h-6 text-gray-400" />
+              ) : (
+                <EyeIcon className="w-6 h-6 text-gray-400" />
+              )}
+            </button>
+            {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+              <div className="text-red-500 text-sm mt-1">{formik.errors.confirmPassword}</div>
+            )}
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-purple-500 text-white py-3 rounded-xl font-semibold hover:bg-purple-600 transition duration-300"
+          >
+            Sign up
+          </button>
+        </form>
+        <p className="text-center text-sm text-gray-500 mt-4">
+          By signing up, I agree to the{' '}
+          <Link href="/privacy-policy" className="text-purple-500 hover:underline">
+            Privacy Policy
+          </Link>{' '}
+          and{' '}
+          <Link href="/terms" className="text-purple-500 hover:underline">
+            Terms and Conditions
+          </Link>
+        </p>
+        <div className="flex justify-center space-x-4 mt-6">
+          <button className="w-12 h-12 flex items-center justify-center rounded-xl border border-gray-300 hover:bg-gray-50 transition duration-300">
+            <LinkedInSvg/>
+          </button>
+          <button className="w-12 h-12 flex items-center justify-center rounded-xl border border-gray-300 hover:bg-gray-50 transition duration-300">
+            <GoogleSvg/>
+          </button>
+          <button className="w-12 h-12 flex items-center justify-center rounded-xl border border-gray-300 hover:bg-gray-50 transition duration-300">
+            <FacebookSvg/>
+          </button>
+        </div>
+        <p className="text-center text-sm text-gray-500 mt-6">
+          Have an account?{' '}
+          <Link href="/sign-in" className="text-purple-500 font-semibold hover:underline">
+            Login
+          </Link>
+        </p>
       </div>
-      <div className="flex flex-col gap-3">
-        <GoogleSignInButton>Sign up with Google</GoogleSignInButton>
-        <FacebookSignInButton>Sign up with Facebook</FacebookSignInButton>
-      </div>
-      <p className='text-center text-sm text-gray-600 mt-2'>
-        If you already have an account, please&nbsp;
-        <Link className='text-blue-500 hover:underline' href='/sign-in'>
-          Sign in
-        </Link>
-      </p>
-    </Form>
-  );
-};
-
-export default SignUpForm;
+    </div>
+  )
+}

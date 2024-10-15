@@ -1,10 +1,5 @@
-import SignInForm from "@/components/forms/SignInForm";
+import SignIn from "@/components/page-content/signIn";
 
-const Signin = () => {
-    return (
-        <div className="w-full">
-            <SignInForm />
-        </div>
-    )
+export default function SignInPage() {
+  return <SignIn />;
 }
-export default Signin;

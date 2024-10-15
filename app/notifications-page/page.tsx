@@ -1,142 +1,146 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import axios from 'axios';
+'use client'
+import { useState, useEffect } from 'react'
+import { XMarkIcon, UserIcon, PuzzlePieceIcon, BellIcon } from '@heroicons/react/24/outline'
+import Cookies from 'js-cookie'
 
 interface Notification {
-  id: string;
-  notificationMessage: string;
-  createdAt: string;
-  userAction: string;
+  id: string
+  notificationMessage: string
+  createdAt: string
   notificationType: {
-    name: string;
-  };
-  fromUser: {
-    name: string;
-    files?: {
-      url: string;
-    }[];
-  };
+    notificationName: string
+  }
+  userRequestAction: string
 }
 
 interface NotificationsResponse {
   todays: {
-    total: number;
-    data: Notification[];
-  };
+    total: number
+    data: Notification[]
+  }
   others: {
-    data: Notification[];
-    total: number;
-    currentPage: number;
-    totalPages: number;
-  };
-  unreadCount: number;
+    total: number
+    data: Notification[]
+  }
+  unreadCount: number
 }
 
-const NotificationsPage: React.FC = () => {
-  const [notifications, setNotifications] = useState<NotificationsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const page = Number(searchParams.get('page')) || 1;
-  const limit = Number(searchParams.get('limit')) || 10;
+export default function NotificationsComponent() {
+  const [notifications, setNotifications] = useState<NotificationsResponse | null>(null)
+  const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        setLoading(true);
-        const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imdob3N0QHNoYXBlci51cyIsInN1YiI6ImNmMDJlMzg4LWNkNjUtNGU3MC1iMzhkLTMwMTVmNTRkNGJlMiIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzI3OTY5MzgwLCJleHAiOjE3Mjc5NzI5ODB9.e9JAh4YoqkZ0lAHc3043v-tZO2VzwZbY_hFMvcoW_BA'
-        if (!token) {
-          throw new Error('No authentication token found');
-        }
+    fetchNotifications()
+  }, [])
 
-        const response = await axios.get<NotificationsResponse>(`/api/notification`,{
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setNotifications(response.data);
-        setError(null);
-      } catch (err) {
-        if (axios.isAxiosError(err) && err.response?.status === 401) {
-          setError('Unauthorized access. Please log in again.');
-          // Redirect to login page
-          router.push('/login');
-        } else {
-          setError('Failed to fetch notifications');
-          console.error(err);
-        }
-      } finally {
-        setLoading(false);
+  const fetchNotifications = async () => {
+    try {
+      const accessToken = Cookies.get('accessToken')
+      
+      if (!accessToken) {
+        console.error('No access token found')
+        return
       }
-    };
 
-    fetchNotifications();
-  }, [page, limit, router]);
+      const response = await fetch('/api/notification', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      })
 
-  const renderNotification = (notification: Notification) => (
-    <div key={notification.id} className="bg-white p-4 rounded-lg shadow mb-4">
-      <div className="flex items-center mb-2">
-        {notification.fromUser?.files && notification.fromUser?.files.length > 0 && notification.fromUser?.files[0].url && (
-          <img
-            src={notification.fromUser.files[0].url}
-            alt={notification.fromUser.name}
-            className="w-10 h-10 rounded-full mr-3"
-          />
-        )}
-        <div>
-          <h3 className="font-semibold">{notification.fromUser?.name}</h3>
-          <p className="text-sm text-gray-500">{notification.notificationType.name}</p>
-        </div>
-      </div>
-      <p className="text-gray-700">{notification.notificationMessage}</p>
-      <div className="mt-2 text-sm text-gray-500 flex justify-between">
-        <span>{new Date(notification.createdAt).toLocaleString()}</span>
-        <span className={`px-2 py-1 rounded ${
-          notification.userAction === 'unread' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100'
-        }`}>
-          {notification.userAction}
-        </span>
-      </div>
-    </div>
-  );
+      if (!response.ok) {
+        throw new Error('Failed to fetch notifications')
+      }
 
-  if (loading) return <div className="text-center py-10">Loading...</div>;
-  if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
-  if (!notifications) return null;
+      const data = await response.json()
+      setNotifications(data)
+    } catch (error) {
+      console.error('Error fetching notifications:', error)
+    }
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }).toUpperCase()
+  }
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'Friend Request':
+      case 'Friend Request Accepted':
+        return <UserIcon className="w-10 h-10 text-purple-500" />
+      case 'Game Request':
+        return <PuzzlePieceIcon className="w-10 h-10 text-purple-500" />
+      default:
+        return <UserIcon className="w-10 h-10 text-purple-500" />
+    }
+  }
+
+  const getStatusTag = (action: string) => {
+    if (action === 'accepted') {
+      return <span className="px-2 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded-full">ACCEPTED</span>
+    }
+    return null
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Notifications</h1>
-      <div className="mb-4">
-        <span className="font-semibold">Unread notifications:</span> {notifications.unreadCount}
-      </div>
-      
-      <h2 className="text-2xl font-semibold mb-4">Today's Notifications</h2>
-      {notifications.todays.data.map(renderNotification)}
-      
-      <h2 className="text-2xl font-semibold my-6">Earlier Notifications</h2>
-      {notifications.others.data.map(renderNotification)}
-      
-      <div className="mt-6 flex justify-between items-center">
-        <a
-          href={`/notifications?page=${Math.max(1, page - 1)}&limit=${limit}`}
-          className={`bg-blue-500 text-white px-4 py-2 rounded ${page <= 1 ? 'pointer-events-none opacity-50' : ''}`}
-        >
-          Previous
-        </a>
-        <span>Page {page} of {notifications.others.totalPages}</span>
-        <a
-          href={`/notifications?page=${Math.min(notifications.others.totalPages, page + 1)}&limit=${limit}`}
-          className={`bg-blue-500 text-white px-4 py-2 rounded ${page >= notifications.others.totalPages ? 'pointer-events-none opacity-50' : ''}`}
-        >
-          Next
-        </a>
-      </div>
+    <div>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="fixed top-4 right-4 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+      >
+        <BellIcon className="w-6 h-6 text-purple-500" />
+        {notifications && notifications.unreadCount > 0 && (
+          <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full">
+            {notifications.unreadCount}
+          </span>
+        )}
+      </button>
+      {isOpen && (
+        <div className="fixed inset-y-0 right-0 w-96 bg-white shadow-xl">
+          <div className="flex items-center justify-between p-4 border-b">
+            <h2 className="text-xl font-semibold">Notifications</h2>
+            <button onClick={() => setIsOpen(false)} className="text-gray-500 hover:text-gray-700">
+              <XMarkIcon className="w-6 h-6" />
+            </button>
+          </div>
+          <div className="overflow-y-auto h-full pb-20">
+            {notifications && (
+              <>
+                {notifications.todays.total > 0 && (
+                  <div className="p-4">
+                    <h3 className="text-sm font-semibold text-gray-500 mb-2">TODAY</h3>
+                    {notifications.todays.data.map((notification) => (
+                      <NotificationItem key={notification.id} notification={notification} />
+                    ))}
+                  </div>
+                )}
+                {notifications.others.total > 0 && (
+                  <div className="p-4">
+                    <h3 className="text-sm font-semibold text-gray-500 mb-2">OLDER</h3>
+                    {notifications.others.data.map((notification) => (
+                      <NotificationItem key={notification.id} notification={notification} />
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
-  );
-};
+  )
 
-export default NotificationsPage;
+  function NotificationItem({ notification }: { notification: Notification }) {
+    return (
+      <div className="flex items-start space-x-3 mb-4">
+        {getNotificationIcon(notification.notificationType.notificationName)}
+        <div className="flex-1">
+          <p className="text-sm font-medium">{notification.notificationMessage}</p>
+          <p className="text-xs text-gray-500">{formatDate(notification.createdAt)}</p>
+        </div>
+        {getStatusTag(notification.userRequestAction)}
+      </div>
+    )
+  }
+}

@@ -8,63 +8,128 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-	container:{
-		center:true,
-		padding:"2rem",
-		screens:{
-			"2xl":"1440px",
-		},
-	},
-  	extend: {
-  		colors: {
-  			background: 'hsl(var(--background))',
-  			foreground: 'hsl(var(--foreground))',
-  			card: {
-  				DEFAULT: 'hsl(var(--card))',
-  				foreground: 'hsl(var(--card-foreground))'
-  			},
-  			popover: {
-  				DEFAULT: 'hsl(var(--popover))',
-  				foreground: 'hsl(var(--popover-foreground))'
-  			},
-  			primary: {
-  				DEFAULT: 'hsl(var(--primary))',
-  				foreground: 'hsl(var(--primary-foreground))'
-  			},
-  			secondary: {
-  				DEFAULT: 'hsl(var(--secondary))',
-  				foreground: 'hsl(var(--secondary-foreground))'
-  			},
-  			muted: {
-  				DEFAULT: 'hsl(var(--muted))',
-  				foreground: 'hsl(var(--muted-foreground))'
-  			},
-  			accent: {
-  				DEFAULT: 'hsl(var(--accent))',
-  				foreground: 'hsl(var(--accent-foreground))'
-  			},
-  			destructive: {
-  				DEFAULT: 'hsl(var(--destructive))',
-  				foreground: 'hsl(var(--destructive-foreground))'
-  			},
-  			border: 'hsl(var(--border))',
-  			input: 'hsl(var(--input))',
-  			ring: 'hsl(var(--ring))',
-  			chart: {
-  				'1': 'hsl(var(--chart-1))',
-  				'2': 'hsl(var(--chart-2))',
-  				'3': 'hsl(var(--chart-3))',
-  				'4': 'hsl(var(--chart-4))',
-  				'5': 'hsl(var(--chart-5))'
-  			}
-  		},
-  		borderRadius: {
-  			lg: 'var(--radius)',
-  			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
-  		}
-  	}
+    extend: {
+      colors: {
+        primary: {
+          50: '#E6E1EE',
+          100: '#D2CDDA',
+          200: '#242229',
+          300: '#D2CFD7',
+          400: '#F1EBF9',
+          500: '#BDAFFF',
+          600: '#0072E5',
+          700: '#886FFF',
+          800: '#38229F',
+          900: '#886FFF',
+          DEFAULT: '#8A80B9',
+          light: '#66B2FF',
+          dark: '#0059B2',
+          contrastText: '#fff',
+        },
+        primaryDark: {
+          50: '#E2EDF8',
+          100: '#6A51E1',
+          200: '#91B9E3',
+          300: '#5090D3',
+          400: '#265D97',
+          500: '#1E4976',
+          600: '#173A5E',
+          700: '#132F4C',
+          800: '#001E3C',
+          900: '#0A1929',
+        },
+        purple: {
+          50: '#886fff1a',
+          100: '#6A51E1',
+        },
+        common: {
+          black: '#1D1D1D',
+          white: '#FFFFFF',
+          rubies: '#FC3952',
+          energies: '#FEC943',
+        },
+        text: {
+          primary: '#343434',
+          secondary: '#2C2535',
+          disabled: '#BDBDBD',
+        },
+        grey: {
+          50: '#f2f2f2',
+          100: '#eaeaeb',
+          200: '#D6D6D6',
+          300: '#A09BA8',
+          400: '#F4F4F4',
+          500: '#EFEFEF',
+          600: '#161419',
+          700: '#EAEAEA',
+          800: '#2F3A45',
+          900: '#20262D',
+        },
+        error: {
+          50: '#FFF0F1',
+          100: '#FFDBDE',
+          200: '#FFBDC2',
+          300: '#FF99A2',
+          400: '#FF7A86',
+          500: '#FF505F',
+          600: '#EB0014',
+          700: '#C70011',
+          800: '#94000D',
+          900: '#570007',
+        },
+        success: {
+          50: '#E9FBF0',
+          100: '#C6F6D9',
+          200: '#9AEFBC',
+          300: '#6AE79C',
+          400: '#3EE07F',
+          500: '#0ADC8E',
+          600: '#1DB45A',
+          700: '#1AA251',
+          800: '#178D46',
+          900: '#0F5C2E',
+        },
+        warning: {
+          50: '#FFF9EB',
+          100: '#FFF4DB',
+          200: '#FFEDC2',
+          300: '#FFE4A3',
+          400: '#FFD980',
+          500: '#FCC419',
+          600: '#FAB005',
+          700: '#F1A204',
+          800: '#DB9A00',
+          900: '#8F6400',
+        },
+        background: {
+          paper: '#FFFFFF',
+          default: '#E6E1EE',
+        },
+        divider: '#E5E8EC',
+      },
+      fontFamily: {
+        poppins: ['Poppins', 'sans-serif'],
+      },
+      borderRadius: {
+        '8': '8px',
+      },
+      padding: {
+        '13-20-15': '13px 20px 15px',
+        '12-20-14': '12px 20px 14px',
+      },
+      boxShadow: {
+        '2px-purple': '0px 0px 0px 2px #8674DB1A',
+        '24px-light': '0px 24px 64px 0px #C8C3D066',
+      },
+    },
+    screens: {
+      xs: '0px',
+      sm: '600px',
+      md: '768px',
+      lg: '992px',
+      xl: '1200px',
+    },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [],
 };
 export default config;
