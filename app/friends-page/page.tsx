@@ -59,22 +59,10 @@ export default function FriendsComponent() {
 
   return (
     <div>
-      {/* Friends Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-16 right-4 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
-      >
-        <UserGroupIcon className="w-6 h-6 text-purple-500" />
-      </button>
-
       {/* Friends Modal */}
-      {isOpen && (
-        <div className="fixed inset-y-0 right-0 w-96 bg-white shadow-xl">
+        <div>
           <div className="flex items-center justify-between p-4 border-b">
             <h2 className="text-xl font-semibold">Friends</h2>
-            <button onClick={() => setIsOpen(false)} className="text-gray-500 hover:text-gray-700">
-              <XMarkIcon className="w-6 h-6" />
-            </button>
           </div>
           <div className="p-4">
             <div className="flex space-x-4 mb-4">
@@ -126,7 +114,6 @@ export default function FriendsComponent() {
             </div>
           </div>
         </div>
-      )}
     </div>
   )
 }

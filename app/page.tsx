@@ -8,6 +8,7 @@ export default function Home() {
         <Link className="w-[30%] bg-purple-500 text-white py-3 rounded-xl font-semibold hover:bg-purple-600 transition duration-300 text-center" href='/sign-in'>Go to sign in page</Link>
         <Link className="w-[30%] bg-purple-500 text-white py-3 rounded-xl font-semibold hover:bg-purple-600 transition duration-300 text-center" href='/sign-up'>Go to sign up page</Link>
         <Link className="w-[30%] bg-purple-500 text-white py-3 rounded-xl font-semibold hover:bg-purple-600 transition duration-300 text-center" href='/onboarding-form'>Go to onboarding steps page</Link>
+        <Link className="w-[30%] bg-purple-500 text-white py-3 rounded-xl font-semibold hover:bg-purple-600 transition duration-300 text-center" href='/stripe'>Go to Stripe page</Link>
         <Link className="w-[30%] bg-purple-500 text-white py-3 rounded-xl font-semibold hover:bg-purple-600 transition duration-300 text-center" href='/admin'>Go to Home page</Link>
       </div>
     </>
