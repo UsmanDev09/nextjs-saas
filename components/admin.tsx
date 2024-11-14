@@ -1,21 +1,14 @@
 'use client';
+
 import { useState } from 'react';
 import {
-  BellIcon,
-  UserGroupIcon,
-  Squares2X2Icon,
-  CubeIcon,
-  LinkIcon,
-  PencilIcon,
-  BeakerIcon,
   ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/outline';
 import NotificationsComponent from '@/app/notifications-page/page';
 import FriendsComponent from '@/app/friends-page/page';
 
-export default function Admin({ loggedInUser }: any) {
+export default function Admin({ loggedInUser } : { loggedInUser: string }) {
   const [activeTab, setActiveTab] = useState('Week');
-  console.log(loggedInUser)
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -30,12 +23,17 @@ export default function Admin({ loggedInUser }: any) {
       </div>
 
       {/* Main Content */}
-      <div className='flex justify-center w-full'>
+      <div className="flex justify-center w-full">
         <div className="flex justify-center items-center min-w-[55%] p-4">
           <div className="max-w-4xl mx-[5%] space-y-8 flex-grow">
             <div className="flex justify-between items-center">
-              <h1 className="text-3xl font-bold">Hello, {loggedInUser}</h1>
-              <p className="text-sm text-gray-500">You have no new game requests</p>
+              <h1 className="text-3xl font-bold">
+                Hello,
+                {loggedInUser}
+              </h1>
+              <p className="text-sm text-gray-500">
+                You have no new game requests
+              </p>
             </div>
 
             {/* Game of the Day */}
@@ -72,7 +70,9 @@ export default function Admin({ loggedInUser }: any) {
             <div className="bg-white rounded-lg p-6 shadow">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Achievements 1/40</h3>
-                <button className="text-sm text-purple-500 font-medium">SEE ALL</button>
+                <button type="button" className="text-sm text-purple-500 font-medium">
+                  SEE ALL
+                </button>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-gray-100 rounded-lg p-4">
@@ -124,12 +124,14 @@ export default function Admin({ loggedInUser }: any) {
                 <div className="flex space-x-2">
                   {['Week', 'Month'].map((tab) => (
                     <button
+                      type="button"
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`px-4 py-1 rounded-full text-sm font-medium ${activeTab === tab
-                        ? 'bg-purple-500 text-white'
-                        : 'text-gray-500 hover:bg-gray-100'
-                        }`}
+                      className={`px-4 py-1 rounded-full text-sm font-medium ${
+                        activeTab === tab
+                          ? 'bg-purple-500 text-white'
+                          : 'text-gray-500 hover:bg-gray-100'
+                      }`}
                     >
                       {tab}
                     </button>
@@ -143,7 +145,9 @@ export default function Admin({ loggedInUser }: any) {
                     <div className="flex-grow bg-gray-200 h-2 rounded-full">
                       <div className="bg-purple-500 h-2 rounded-full w-0" />
                     </div>
-                    <span className="w-16 text-right text-sm text-gray-500">0/25</span>
+                    <span className="w-16 text-right text-sm text-gray-500">
+                      0/25
+                    </span>
                   </div>
                 ))}
               </div>
@@ -169,14 +173,12 @@ export default function Admin({ loggedInUser }: any) {
             </div>
           </div>
 
-
           {/* Friends Component */}
           <div className="bg-white p-4 h-full rounded-lg">
             <FriendsComponent />
           </div>
         </div>
       </div>
-
     </div>
   );
 }

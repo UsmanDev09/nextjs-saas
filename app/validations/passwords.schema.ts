@@ -1,4 +1,4 @@
-import { object, ref, string } from 'yup';
+import { object, string } from 'yup';
 
 import { PASSWORD_REGEX, validationMessages } from '@/constants';
 
@@ -16,7 +16,6 @@ export const passwordSchema = object()
 export const confirmPasswordSchema = object()
   .shape({
     confirmPassword: string()
-      .oneOf([ref('password'), null], validationMessages.comparePassword)
       .required('Confirm password is a required field')
       .trim(),
   })

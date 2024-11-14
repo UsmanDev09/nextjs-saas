@@ -1,8 +1,8 @@
-import { authOptions } from "@/lib/auth"
-import { getServerSession } from "next-auth"
-import { NextResponse } from "next/server";
+import { withAuth } from '@/lib/(middlewares)/authMiddleWare';
+import { NextResponse } from 'next/server';
 
-export const GET = async (req:Request)=>{
-    const session = await getServerSession(authOptions);
-    return NextResponse.json({authenticated:!!session});
+async function checkAuth() {
+  return NextResponse.json({ authenticated: true });
 }
+
+export const GET = withAuth(checkAuth);

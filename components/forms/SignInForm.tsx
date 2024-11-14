@@ -1,128 +1,156 @@
-"use client"
+'use client';
 
-import { useForm } from "react-hook-form";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
-import * as z from "zod"
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import Link from "next/link";
-import GoogleSignInButton from "../GoogleSignInButton";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useToast } from "@/hooks/use-toast";
-import FacebookSignInButton from "../FacebookSignInButton";
+import Link from 'next/link';
+import { useState } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
+import {
+  EnvelopeIcon,
+  EyeIcon,
+  EyeSlashIcon,
+  LockClosedIcon,
+} from '@heroicons/react/24/outline';
+import { toast } from 'react-toastify';
+import { signIn } from 'next-auth/react';
 
-const FormSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Invalid email'),
-  password: z
-    .string()
-    .min(1, 'Password is required')
-    .min(8, 'Password must have than 8 characters'),
-})
+const validationSchema = Yup.object({
+  email: Yup.string().email('Invalid email address').required('Required'),
+  password: Yup.string()
+    .min(8, 'Must be at least 8 characters')
+    .required('Required'),
+});
 
-const SignInForm = () => {
+export default function SignInPage() {
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const { toast } = useToast()
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  })
-  const onSubmit = async (values: z.infer<typeof FormSchema>) => {
-    try {
-      // const signInData = await signIn('credentials', {
-      //   email: values.email,
-      //   password: values.password,
-      //   redirect: false,
-      // });
-      const signInData = await fetch('http://localhost:3001/sign-in',{
-        method:'POST',
-        headers:{
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            email: values.email,
-            password: values.password
-        }),
-      })
 
-      if (!signInData?.ok) {
-        toast({
-          title: "Error",
-          description: "Wrong Email or Password",
-          variant: 'destructive',
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      try {
+        const { email, password } = values;
+
+        const response = await signIn('credentials', {
+          email,
+          password,
+          redirect: false,
         });
-      } else if (signInData?.ok) {
-        router.refresh();
-        router.push('/admin');
-      } else {
-        toast({
-          title: "Error",
-          description: "An unexpected error occurred",
-          variant: 'destructive',
-        });
+
+        if (response?.ok) {
+          toast.success('Signin successfull');
+          router.push('onboarding-form');
+        }
+      } catch (error: unknown) {
+        let errorMessage;
+        if (axios.isAxiosError(error) && error.response) {
+          errorMessage = error.response.data.error || 'An error occurred';
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        } else {
+          errorMessage = 'An unexpected error occured';
+        }
+
+        toast.error(errorMessage);
       }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        variant: 'destructive',
-      });
-    }
-  };
+    },
+  });
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
-        <div className="space-y-2">
-
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input type="email" placeholder="email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+    <div className="min-h-screen bg-purple-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md">
+        <div className="flex justify-center mb-6">
+          <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center">
+            <span className="text-white text-2xl font-bold">S</span>
+          </div>
         </div>
-        <Button className="w-full mt-6" type="submit">Sign In</Button>
-      </form>
-      <div className='mx-auto my-4 flex w-full items-center justify-evenly before:mr-4 before:block before:h-px before:flex-grow before:bg-stone-400 after:ml-4 after:block after:h-px after:flex-grow after:bg-stone-400'>
-        or
+        <h1 className="text-3xl font-bold text-center mb-2">Welcome Back!</h1>
+        <p className="text-gray-500 text-center mb-8">
+          Glad to see you again!
+        </p>
+        <form onSubmit={formik.handleSubmit} className="space-y-4">
+          <div className="relative">
+            <EnvelopeIcon className="w-6 h-6 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+            <input
+              type="email"
+              placeholder="Your email"
+              className={`w-full pl-12 pr-4 py-3 rounded-xl border ${
+                formik.touched.email && formik.errors.email
+                  ? 'border-red-500'
+                  : 'border-gray-300'
+              } focus:outline-none focus:ring-2 focus:ring-purple-500`}
+              {...formik.getFieldProps('email')}
+            />
+            {formik.touched.email && formik.errors.email && (
+              <div className="text-red-500 text-sm mt-1">
+                {formik.errors.email}
+              </div>
+            )}
+          </div>
+          <div className="relative">
+            <LockClosedIcon className="w-6 h-6 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password"
+              className={`w-full pl-12 pr-12 py-3 rounded-xl border ${
+                formik.touched.password && formik.errors.password
+                  ? 'border-red-500'
+                  : 'border-gray-300'
+              } focus:outline-none focus:ring-2 focus:ring-purple-500`}
+              {...formik.getFieldProps('password')}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2"
+            >
+              {showPassword ? (
+                <EyeSlashIcon className="w-6 h-6 text-gray-400" />
+              ) : (
+                <EyeIcon className="w-6 h-6 text-gray-400" />
+              )}
+            </button>
+            {formik.touched.password && formik.errors.password && (
+              <div className="text-red-500 text-sm mt-1">
+                {formik.errors.password}
+              </div>
+            )}
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-purple-500 text-white py-3 rounded-xl font-semibold hover:bg-purple-600 transition duration-300"
+          >
+            Sign in
+          </button>
+        </form>
+        <p className="text-center text-sm text-gray-500 mt-4">
+          By signing in, I agree to the
+          <Link
+            href="/privacy-policy"
+            className="text-purple-500 hover:underline"
+          >
+            Privacy Policy
+          </Link>
+          and
+          <Link href="/terms" className="text-purple-500 hover:underline">
+            Terms and Conditions
+          </Link>
+        </p>
+        <p className="text-center text-sm text-gray-500 mt-6">
+          Don&apos;t have an account?
+          <Link
+            href="/sign-up"
+            className="text-purple-500 font-semibold hover:underline"
+          >
+            Sign up
+          </Link>
+        </p>
       </div>
-      <div className="flex flex-col gap-3">
-        <GoogleSignInButton>Sign in with Google</GoogleSignInButton>
-        <FacebookSignInButton>Sign in with Facebook</FacebookSignInButton>
-      </div>
-      <p className='text-center text-sm text-gray-600 mt-2'>
-        If you don&apos;t have an account, please&nbsp;
-        <Link className='text-blue-500 hover:underline' href='/sign-up'>
-          Sign up
-        </Link>
-      </p>
-    </Form>
-  )
+    </div>
+  );
 }
-
-export default SignInForm;

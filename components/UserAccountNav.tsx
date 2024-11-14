@@ -1,14 +1,20 @@
-'use client'
-import { Button } from "./ui/button"
-import { signOut } from "next-auth/react";
+'use client';
 
-const UserAccountNav = () => {
+import { signOut } from 'next-auth/react';
+
+function UserAccountNav() {
   return (
-        <Button onClick={()=>signOut({
-            redirect:true,
-            callbackUrl:`${window.location.origin}/sign-in`
-        })} variant='destructive'>Sign Out</Button>
-  )
+    <button
+      type="button"
+      onClick={() => signOut({
+        redirect: true,
+        callbackUrl: `${window.location.origin}/sign-in`,
+      })}
+      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+    >
+      Sign Out
+    </button>
+  );
 }
 
-export default UserAccountNav
+export default UserAccountNav;

@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 
-import type { RootState } from '@/redux/store';
+import type { RootState } from '@/app/redux/store';
 
 export const NotificationsStateSelector = ({ notifications }: RootState) => notifications;
 

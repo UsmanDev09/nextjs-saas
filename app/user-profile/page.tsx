@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
 
 interface UserProfile {
   id: string;
@@ -18,41 +18,40 @@ interface User {
 }
 
 export default function UserProfile() {
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAc2hhcGVyLnVzIiwic3ViIjoiYzI0Y2Y2ZTUtNWI0YS00YTZhLWI3MDQtNTEyMWZmMTBiNDk5Iiwicm9sZSI6InVzZXIiLCJpYXQiOjE3Mjc3MjM5MDAsImV4cCI6MTcyNzcyNzUwMH0.uC_E9so4SV5O2TPoTdAjgxCkp0l-fU0Hgig7TETydm8'
+  const accessToken = Cookies.get('accessToken');
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
   useEffect(() => {
-    fetchUserProfile();
-  }, []);
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch('/api/profile', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
 
-  const fetchUserProfile = async () => {
-    try {
-      const response = await fetch('/api/profile', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+        if (!response.ok) {
+          throw new Error('Failed to fetch user profile');
+        }
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch user profile');
+        const data = await response.json();
+        setProfile(data.userProfile);
+        setUser(data.user);
+        setIsLoading(false);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to load user profile');
+        setIsLoading(false);
       }
+    };
 
-      const data = await response.json();
-      setProfile(data.userProfile);
-      setUser(data.user);
-      setIsLoading(false);
-    } catch (error) {
-      setError('Failed to load user profile');
-      setIsLoading(false);
-    }
-  };
+    fetchUserProfile();
+  }, [accessToken]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -92,8 +91,8 @@ export default function UserProfile() {
       setProfile(updatedData.profile);
       setIsEditing(false);
       setIsLoading(false);
-    } catch (error) {
-      setError('Failed to update profile');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to update profile');
       setIsLoading(false);
     }
   };
@@ -112,69 +111,88 @@ export default function UserProfile() {
       {isEditing ? (
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="name"
+            >
               Name
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="name"
+                type="text"
+                name="name"
+                value={user?.name || ''}
+                onChange={handleInputChange}
+              />
             </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="name"
-              type="text"
-              name="name"
-              value={user?.name || ''}
-              onChange={handleInputChange}
-            />
+
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="username"
+            >
               Username
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="username"
+                type="text"
+                name="username"
+                value={user?.username || ''}
+                onChange={handleInputChange}
+              />
             </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="username"
-              type="text"
-              name="username"
-              value={user?.username || ''}
-              onChange={handleInputChange}
-            />
+
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="age">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="age"
+            >
               Age
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="age"
+                type="number"
+                name="age"
+                value={profile?.age || ''}
+                onChange={handleInputChange}
+              />
             </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="age"
-              type="number"
-              name="age"
-              value={profile?.age || ''}
-              onChange={handleInputChange}
-            />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="gender">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="gender"
+            >
               Gender
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="gender"
+                type="text"
+                name="gender"
+                value={profile?.gender || ''}
+                onChange={handleInputChange}
+              />
             </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="gender"
-              type="text"
-              name="gender"
-              value={profile?.gender || ''}
-              onChange={handleInputChange}
-            />
+
           </div>
           <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phoneNumber">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="phoneNumber"
+            >
               Phone Number
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="phoneNumber"
+                type="tel"
+                name="phoneNumber"
+                value={profile?.phoneNumber || ''}
+                onChange={handleInputChange}
+              />
             </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="phoneNumber"
-              type="tel"
-              name="phoneNumber"
-              value={profile?.phoneNumber || ''}
-              onChange={handleInputChange}
-            />
+
           </div>
           <div className="flex items-center justify-between">
             <button
@@ -194,12 +212,33 @@ export default function UserProfile() {
         </form>
       ) : (
         <div>
-          <p className="mb-2"><strong>Name:</strong> {user?.name}</p>
-          <p className="mb-2"><strong>Username:</strong> {user?.username}</p>
-          <p className="mb-2"><strong>Age:</strong> {profile?.age}</p>
-          <p className="mb-2"><strong>Gender:</strong> {profile?.gender}</p>
-          <p className="mb-2"><strong>Phone Number:</strong> {profile?.phoneNumber}</p>
+          <p className="mb-2">
+            <strong>Name:</strong>
+            {' '}
+            {user?.name}
+          </p>
+          <p className="mb-2">
+            <strong>Username:</strong>
+            {' '}
+            {user?.username}
+          </p>
+          <p className="mb-2">
+            <strong>Age:</strong>
+            {' '}
+            {profile?.age}
+          </p>
+          <p className="mb-2">
+            <strong>Gender:</strong>
+            {' '}
+            {profile?.gender}
+          </p>
+          <p className="mb-2">
+            <strong>Phone Number:</strong>
+            {' '}
+            {profile?.phoneNumber}
+          </p>
           <button
+            type="button"
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4"
             onClick={() => setIsEditing(true)}
           >

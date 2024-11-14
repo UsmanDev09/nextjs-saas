@@ -1,5 +1,20 @@
-import type { INotificationResponse } from '@/data-transfer/responses';
+interface NotificationData {
+  id: string;
+  message: string;
+  date: string;
+}
 
-export default interface INotificationsState {
-  notifications: INotificationResponse;
+export interface INotificationsState {
+  notifications: {
+    todays: {
+      total: number;
+      data: NotificationData[];
+    };
+    others: {
+      total: number;
+      currentPage: number;
+      data: NotificationData[];
+      totalPages: number;
+    };
+  };
 }

@@ -1,8 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { getNotifications } from './thunks';
-
-import type INotificationsState from './types';
+import type { INotificationsState } from './types';
 
 const initialState: INotificationsState = {
   notifications: {
@@ -27,15 +25,6 @@ export const notificationsSlice = createSlice({
     setNotifications: (state, action) => {
       state.notifications = action.payload;
     },
-  },
-  extraReducers: (builder) => {
-    builder.addCase(getNotifications.fulfilled, (state, { payload }) => {
-      if (!payload) {
-        return;
-      } else {
-        state.notifications = payload;
-      }
-    });
   },
 });
 

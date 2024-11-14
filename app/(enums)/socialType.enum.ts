@@ -1,8 +1,7 @@
 enum SocialType {
-    Google = 'google',
-    Linkedin = 'linkedin',
-    Facebook = 'facebook',
-  }
-  
-  export default SocialType;
-  
+  Google = 'google',
+  Linkedin = 'linkedin',
+  Facebook = 'facebook',
+}
+
+export default SocialType;

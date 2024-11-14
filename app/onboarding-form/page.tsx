@@ -1,23 +1,49 @@
-'use client'
-import { useState } from 'react'
-import { ChevronDownIcon, UserIcon, CalendarIcon, ChevronLeftIcon } from '@heroicons/react/24/outline'
-import { useFormik } from 'formik'
-import * as Yup from 'yup'
-import axios from 'axios'
+'use client';
 
-const steps = ['Tell us a little bit about yourself', "What's important for you?", "What's your preferred learning pace?", 'Which describes you best?']
+import { useState } from 'react';
+import {
+  ChevronDownIcon,
+  UserIcon,
+  CalendarIcon,
+  ChevronLeftIcon,
+} from '@heroicons/react/24/outline';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 interface FormData {
   name: string;
   age: string;
   gender: string;
   importantSkills: string[];
-  learningPace: string;
   userCategory: string;
 }
 
+const steps = [
+  'Tell us a little bit about yourself',
+  "What's important for you?",
+  "What's your preferred learning pace?",
+  'Which describes you best?',
+];
+
+const skills = [
+  'Communication',
+  'Emotional Intelligence',
+  'Critical Thinking',
+  'Collaboration',
+  'Adaptability',
+  'Time Management',
+  'Leadership',
+  'Customer Service',
+  'Digital Literacy',
+  'Work Ethic',
+];
+
+const categories = ['Student', 'Professional'];
+
 export default function OnboardingForm() {
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(1);
 
   const formik = useFormik<FormData>({
     initialValues: {
@@ -25,55 +51,59 @@ export default function OnboardingForm() {
       age: '',
       gender: '',
       importantSkills: [],
-      learningPace: '',
-      userCategory: ''
+      userCategory: '',
     },
     validationSchema: Yup.object({
       name: Yup.string().required('Name is required'),
-      age: Yup.number().required('Age is required').positive('Age must be positive').integer('Age must be a number'),
+      age: Yup.number()
+        .required('Age is required')
+        .positive('Age must be positive')
+        .integer('Age must be a number'),
       gender: Yup.string().required('Gender is required'),
       learningPace: Yup.string().required('Learning pace is required'),
       userCategory: Yup.string().required('User category is required'),
-      importantSkills: Yup.array().min(1, 'Select at least one skill').max(3, 'Select up to 3 skills'),
+      importantSkills: Yup.array()
+        .min(1, 'Select at least one skill')
+        .max(3, 'Select up to 3 skills'),
     }),
     onSubmit: async (values) => {
       try {
         const apiBody = {
-          firstStep: {
-            name: values.name,
-            age: Number(values.age),
-            gender: values.gender.toLowerCase()
-          },
-          secondStep: {
-            profileType: values.userCategory.toLowerCase()
-          },
-          thirdStep: {
-            learningPace: values.learningPace.toLowerCase()
-          },
-          fourthStep: {
-            softSkills: values.importantSkills
-          }
-        }
-        
-        const response = await axios.put('/api/profile/onboarding', apiBody)
-        console.log('Onboarding successful:', response.data)
-      } catch (error) {
-        console.error('Onboarding error:', error)
-      }
-    }
-  })
+          name: values.name,
+          age: Number(values.age),
+          gender: values.gender.toLowerCase(),
+          profileType: values.userCategory.toLowerCase(),
+          softSkills: values.importantSkills,
+        };
 
-  const handleNext = () => setStep(prev => Math.min(prev + 1, steps.length))
-  const handleBack = () => setStep(prev => Math.max(prev - 1, 1))
+        const res = await axios.put('/api/profile/onboarding', apiBody);
+        console.log(res);
+      } catch (error) {
+        let errorMessage;
+        if (axios.isAxiosError(error) && error.response) {
+          errorMessage = error.response.data.error || 'An error occurred';
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        } else {
+          errorMessage = 'An unexpected error occured';
+        }
+
+        toast.error(errorMessage);
+      }
+    },
+  });
+
+  const handleNext = () => setStep((prev) => Math.min(prev + 1, steps.length));
+  const handleBack = () => setStep((prev) => Math.max(prev - 1, 1));
 
   const handleSkillToggle = (skill: string) => {
     formik.setFieldValue(
       'importantSkills',
       formik.values.importantSkills.includes(skill)
-        ? formik.values.importantSkills.filter(s => s !== skill)
-        : [...formik.values.importantSkills, skill].slice(0, 3)
-    )
-  }
+        ? formik.values.importantSkills.filter((s) => s !== skill)
+        : [...formik.values.importantSkills, skill].slice(0, 3),
+    );
+  };
 
   const renderStep = () => {
     switch (step) {
@@ -106,7 +136,9 @@ export default function OnboardingForm() {
                   placeholder="Age"
                 />
                 {formik.touched.age && formik.errors.age && (
-                  <div className="text-red-500 text-sm">{formik.errors.age}</div>
+                  <div className="text-red-500 text-sm">
+                    {formik.errors.age}
+                  </div>
                 )}
               </div>
               <div className="relative">
@@ -123,20 +155,24 @@ export default function OnboardingForm() {
                 </select>
                 <ChevronDownIcon className="w-5 h-5 text-gray-400 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
                 {formik.touched.gender && formik.errors.gender && (
-                  <div className="text-red-500 text-sm">{formik.errors.gender}</div>
+                  <div className="text-red-500 text-sm">
+                    {formik.errors.gender}
+                  </div>
                 )}
               </div>
             </div>
           </>
-        )
+        );
       case 2:
-        const skills = ['Communication', 'Emotional Intelligence', 'Critical Thinking', 'Collaboration', 'Adaptability', 'Time Management', 'Leadership', 'Customer Service', 'Digital Literacy', 'Work Ethic']
         return (
           <div>
-            <p className="text-gray-500 text-center mb-4">Choose three options</p>
+            <p className="text-gray-500 text-center mb-4">
+              Choose three options
+            </p>
             <div className="flex flex-wrap justify-center gap-2">
-              {skills.map(skill => (
+              {skills.map((skill) => (
                 <button
+                  type="button"
                   key={skill}
                   onClick={() => handleSkillToggle(skill)}
                   className={`px-4 py-2 rounded-full text-sm ${
@@ -149,44 +185,20 @@ export default function OnboardingForm() {
                 </button>
               ))}
             </div>
-            {formik.touched.importantSkills && formik.errors.importantSkills && (
-              <div className="text-red-500 text-sm text-center mt-2">{formik.errors.importantSkills}</div>
+            {formik.touched.importantSkills
+              && formik.errors.importantSkills && (
+                <div className="text-red-500 text-sm text-center mt-2">
+                  {formik.errors.importantSkills}
+                </div>
             )}
           </div>
-        )
+        );
       case 3:
-        const paces = [
-          { name: 'Relaxed', description: '1-3 times per week' },
-          { name: 'Ambitious', description: '3-5 times per week' },
-          { name: 'Focused', description: '+5 times per week' },
-        ]
         return (
           <div className="space-y-2">
-            {paces.map(pace => (
+            {categories.map((category) => (
               <button
-                key={pace.name}
-                onClick={() => formik.setFieldValue('learningPace', pace.name)}
-                className={`w-full text-left px-4 py-3 rounded-xl border ${
-                  formik.values.learningPace === pace.name
-                    ? 'border-purple-500 bg-purple-50'
-                    : 'border-gray-300'
-                }`}
-              >
-                <div className="font-semibold">{pace.name}</div>
-                <div className="text-sm text-gray-500">{pace.description}</div>
-              </button>
-            ))}
-            {formik.touched.learningPace && formik.errors.learningPace && (
-              <div className="text-red-500 text-sm text-center mt-2">{formik.errors.learningPace}</div>
-            )}
-          </div>
-        )
-      case 4:
-        const categories = ['Student', 'Professional', 'Career shifter']
-        return (
-          <div className="space-y-2">
-            {categories.map(category => (
-              <button
+                type="button"
                 key={category}
                 onClick={() => formik.setFieldValue('userCategory', category)}
                 className={`w-full text-left px-4 py-3 rounded-xl border ${
@@ -199,23 +211,25 @@ export default function OnboardingForm() {
               </button>
             ))}
             {formik.touched.userCategory && formik.errors.userCategory && (
-              <div className="text-red-500 text-sm text-center mt-2">{formik.errors.userCategory}</div>
+              <div className="text-red-500 text-sm text-center mt-2">
+                {formik.errors.userCategory}
+              </div>
             )}
           </div>
-        )
+        );
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-purple-50 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md mb-8">
         <div className="bg-gray-200 h-2 rounded-full">
-          <div 
+          <div
             className="bg-purple-500 h-2 rounded-full transition-all duration-300 ease-in-out"
             style={{ width: `${(step / steps.length) * 100}%` }}
-          ></div>
+          />
         </div>
       </div>
       <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md">
@@ -254,5 +268,5 @@ export default function OnboardingForm() {
         </form>
       </div>
     </div>
-  )
+  );
 }

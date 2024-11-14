@@ -1,16 +1,20 @@
-import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import { withAuth,AuthenticatedRequest } from "@/lib/(middlewares)/authMiddleWare";
-
-const prisma = new PrismaClient();
+import {
+  withAuth,
+  AuthenticatedRequest,
+} from '@/lib/(middlewares)/authMiddleWare';
 
 async function handlePasswordReset(req: AuthenticatedRequest) {
   try {
     const { password } = await req.json();
-    
+
     if (!req.user || !req.user.sub) {
-      return NextResponse.json({ error: 'User not authenticated' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'User not authenticated' },
+        { status: 401 },
+      );
     }
 
     const user = await prisma.user.findUnique({
@@ -27,10 +31,22 @@ async function handlePasswordReset(req: AuthenticatedRequest) {
       data: { password: hashedPassword },
     });
 
-    return NextResponse.json({ response: "User password changed successfully" }, { status: 200 });
+    return NextResponse.json(
+      { response: 'User password changed successfully' },
+      { status: 200 },
+    );
   } catch (error) {
-    console.error('Error in password reset:', error);
-    return NextResponse.json({ error: 'Failed to reset password' }, { status: 500 });
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: `Failed to reset password: ${error.message}` },
+        { status: 500 },
+      );
+    }
+
+    return NextResponse.json(
+      { error: 'Failed to reset password' },
+      { status: 500 },
+    );
   }
 }
 

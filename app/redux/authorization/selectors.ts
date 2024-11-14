@@ -4,9 +4,7 @@ import type { RootState } from '@/app/redux/store';
 
 export const authorizationsStateSelector = ({ auth }: RootState) => auth;
 
-export const resetPasswordSent = createSelector(
+export const profile = createSelector(
   authorizationsStateSelector,
-  (state) => state.isResetPasswordSent,
+  (state) => state.profile,
 );
-
-export const isLoggedIn = createSelector(authorizationsStateSelector, (state) => state.isLoggedIn);

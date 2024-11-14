@@ -1,92 +1,106 @@
-import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient, Profile, User, UsersToSkills } from "@prisma/client";
-import { AuthenticatedRequest, withAuth } from "@/lib/(middlewares)/authMiddleWare";
-import UserStatus from "@/app/(enums)/userStatus.enum";
-import { OnboardingRequest, OnboardingResponse } from "@/lib/utils";
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import {
+  AuthenticatedRequest,
+  withAuth,
+} from '@/lib/(middlewares)/authMiddleWare';
+import UserStatus from '@/app/(enums)/userStatus.enum';
 
-const prisma = new PrismaClient();
-type UserWithSkillsAndProfile = User & {
-  users_soft_skills:UsersToSkills[];
-  user_profiles: Profile | null;
-};
-
-async function findSoftSkillsByIds(ids: string[]) {
-  if (ids.length) {
-    return ids.map((id) => ({ softSkillId: id }));
-  }
-  return [];
-}
-
-async function profileOnboarding(req: NextRequest) {
-  const authenticatedRequest = req as AuthenticatedRequest;
-  const userId = authenticatedRequest.user!.sub;
+async function profileOnboarding(req: AuthenticatedRequest) {
+  const userId = req.user!.sub;
 
   const onboardingRequestData = await req.json();
-  const onboardingRequest = new OnboardingRequest(onboardingRequestData);
 
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      include: { users_soft_skills: true },
+      include: { usersSoftSkills: true },
     });
 
     if (!user) throw new Error('User not found');
 
-    if (user.status === UserStatus.Active || !user.emailVerified) {
-      throw new Error(
-        user.status === UserStatus.Active
-          ? 'Onboarding already completed'
-          : 'Email not verified'
+    if (!user.emailVerified) {
+      return NextResponse.json(
+        { error: 'Please verify your email before continuing with onboarding' },
+        { status: 403 },
       );
     }
 
-    const usersToSkills = await findSoftSkillsByIds(onboardingRequest?.getFourthStep()?.softSkills ?? []);
-    const data = onboardingRequest.getData(user.id, usersToSkills);
+    if (user.status === UserStatus.Active) {
+      return NextResponse.json(
+        { error: 'Onboarding has already been completed' },
+        { status: 403 },
+      );
+    }
+
+    const softSkillNames = onboardingRequestData.softSkills ?? [];
+
+    const softSkills = await prisma.softSkill.findMany({
+      where: {
+        name: { in: softSkillNames },
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    const softSkillIds = softSkills.map((skill) => skill.id);
 
     await prisma.user.update({
       where: { id: userId },
-      data: data,
+      data: {
+        name: onboardingRequestData.name,
+        usersSoftSkills: {
+          deleteMany: {},
+          createMany: {
+            data: softSkillIds.map((id) => ({
+              softSkillId: id,
+            })),
+          },
+        },
+        userProfiles: {
+          upsert: {
+            create: {
+              age: onboardingRequestData.age,
+              gender: onboardingRequestData.gender,
+              profileType: onboardingRequestData.profileType,
+            },
+            update: {
+              age: onboardingRequestData.age,
+              gender: onboardingRequestData.gender,
+              profileType: onboardingRequestData.profileType,
+            },
+          },
+        },
+      },
     });
 
     const result = await prisma.user.findUnique({
       where: { id: userId },
     });
 
-    const response = new OnboardingResponse(result);
-    if (response.complete) {
-      await prisma.user.update({ where: { id: userId }, data: { status: 'active' } });
+    if (result) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { status: 'active' },
+      });
     }
 
-    return NextResponse.json(response);
+    return NextResponse.json([]);
   } catch (error) {
-    console.error('Error during onboarding:', error);
-    return NextResponse.json({ message: error }, { status: 400 });
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: `${error.message}` },
+        { status: 500 },
+      );
+    }
+
+    return NextResponse.json(
+      { error: 'Failed to complete onboarding' },
+      { status: 500 },
+    );
   }
 }
-export async function getOnboarding(req:AuthenticatedRequest): Promise<NextResponse> {
-  const userId = req.user!.sub;
-  if(!userId){
-    return NextResponse.json({message:"User not authenticated"},{status:401});
-  }
-  const user = await getOneWithSkills(userId);
-  const onboardingResponse = new OnboardingResponse(user);
-  return NextResponse.json(onboardingResponse);
-}
 
-async function getOneWithSkills(id: string): Promise<UserWithSkillsAndProfile> {
-  const user = await prisma.user.findUnique({
-    where: { id },
-    include: {
-      users_soft_skills: true,
-      user_profiles: true,
-    },
-  });
-
-  if (!user) {
-    throw new Error('User not found');
-  }
-
-  return user;
-}
 export const PUT = withAuth(profileOnboarding);
-export const GET = withAuth(getOnboarding);

@@ -1,36 +1,25 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { sendForgotPassword } from './thunks';
+import type { IProfile } from './types';
 
-import type IAuthState from './types';
-
-const initialState: IAuthState = {
-  isResetPasswordSent: false,
-  isLoggedIn: false,
+const initialState: IProfile = {
+  profile: {
+    id: null,
+    name: '',
+    username: '',
+  },
 };
 
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    resetState(state) {
-      state.isResetPasswordSent = false;
+    setProfile(state, action) {
+      state.profile = action.payload;
     },
-    // Fot test SSR purposes only
-    setPasswordSent(state) {
-      state.isResetPasswordSent = true;
-    },
-    setLoggedIn(state, action) {
-      state.isLoggedIn = action.payload;
-    },
-  },
-  extraReducers: (builder) => {
-    builder.addCase(sendForgotPassword.fulfilled, (state) => {
-      state.isResetPasswordSent = true;
-    });
   },
 });
 
-export const { resetState, setPasswordSent, setLoggedIn } = authSlice.actions;
+export const { setProfile } = authSlice.actions;
 
 export default authSlice.reducer;

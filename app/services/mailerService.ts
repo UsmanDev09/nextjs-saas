@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import { stringify } from 'qs';
+
 enum EmailTemplate {
   ForgotPassword = 'ForgotPassword',
   VerifyEmail = 'VerifyEmail',
@@ -12,11 +13,15 @@ const transporter = nodemailer.createTransport({
 });
 
 // Send email function
-const sendEmail = async (recipient: string, subject: string, htmlContent: string): Promise<nodemailer.SentMessageInfo> => {
+const sendEmail = async (
+  recipient: string,
+  subject: string,
+  htmlContent: string,
+): Promise<nodemailer.SentMessageInfo> => {
   const mailOptions = {
     from: `"Shaper" <${process.env.MAILER_EMAIL_FROM}>`,
     to: recipient,
-    subject: subject,
+    subject,
     html: htmlContent,
   };
 
@@ -33,7 +38,11 @@ const getTemplateTitle = (templateId: EmailTemplate): string => {
 };
 
 // Send Forgot Password Email
-const sendForgotPasswordEmail = async (recipient: string, token: string, name?: string): Promise<nodemailer.SentMessageInfo> => {
+const sendForgotPasswordEmail = async (
+  recipient: string,
+  token: string,
+  name?: string,
+): Promise<nodemailer.SentMessageInfo> => {
   const subject = getTemplateTitle(EmailTemplate.ForgotPassword);
   const resetLink = `${process.env.FRONTEND_HOST_URL}/reset-password?${stringify({ token })}`;
   const htmlContent = `<p>Hi ${name},</p><p>Please click the link below to reset your password:</p><a href="${resetLink}">Reset Password</a>`;
@@ -42,14 +51,15 @@ const sendForgotPasswordEmail = async (recipient: string, token: string, name?: 
 };
 
 // Send Verification Email
-const sendVerificationEmail = async (recipient: string, code: string, name: string): Promise<nodemailer.SentMessageInfo> => {
+const sendVerificationEmail = async (
+  recipient: string,
+  code: string,
+  name: string,
+): Promise<nodemailer.SentMessageInfo> => {
   const subject = getTemplateTitle(EmailTemplate.VerifyEmail);
   const htmlContent = `<p>Hi ${name},</p><p>Your verification code is: ${code}</p>`;
 
   return sendEmail(recipient, subject, htmlContent);
 };
 
-export {
-  sendForgotPasswordEmail,
-  sendVerificationEmail,
-};
+export { sendForgotPasswordEmail, sendVerificationEmail };

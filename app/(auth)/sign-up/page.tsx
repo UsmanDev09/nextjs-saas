@@ -1,11 +1,9 @@
-import SignUpForm from "@/components/forms/SignUpForm";
+import SignUpForm from '@/components/forms/SignUpForm';
 
-const page = () => {
-  return (
-    <div className='w-full'>
-      <SignUpForm />
-    </div>
-  );
-};
+const page = () => (
+  <div className="w-full">
+    <SignUpForm />
+  </div>
+);
 
 export default page;

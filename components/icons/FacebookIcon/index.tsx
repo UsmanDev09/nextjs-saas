@@ -1,27 +1,23 @@
-import { SvgIcon } from '@mui/material';
+import React from 'react';
+import { ISvgProps } from '../types';
 
-// import { theme } from '@/constants';
-import { combineSx } from '@/utils';
-
-import styles from '../styles';
-
-import type { ISvgProps } from '../types';
-
-const FacebookIcon = ({
-  viewBox = '0, 0, 24, 24',
+function FacebookIcon({
+  viewBox = '0 0 24 24',
   width = '24',
   height = '24',
   disabled = false,
   direction = 'up',
-  sx,
+  className = '',
   ...rest
-}: ISvgProps) => {
+} : ISvgProps) {
   return (
-    <SvgIcon
+    <svg
       viewBox={viewBox}
       width={width}
       height={height}
-      sx={combineSx(styles.root, styles[direction], sx)}
+      className={`${className} ${direction === 'down' ? 'rotate-180' : ''} ${
+        disabled ? 'opacity-50' : ''
+      }`}
       {...rest}
     >
       <g clipPath="url(#clip0_16251_104746)">
@@ -64,11 +60,16 @@ const FacebookIcon = ({
           <stop offset="1" stopColor="#0064E0" />
         </linearGradient>
         <clipPath id="clip0_16251_104746">
-          <rect width="24" height="24" fill="white" transform="translate(0.166626)" />
+          <rect
+            width="24"
+            height="24"
+            fill="white"
+            transform="translate(0.166626)"
+          />
         </clipPath>
       </defs>
-    </SvgIcon>
+    </svg>
   );
-};
+}
 
 export default FacebookIcon;

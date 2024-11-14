@@ -1,3 +1,9 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,556 +14,102 @@ datasource db {
 }
 
 model User {
-  id                                              String                          @id(map: "PK_a3ffb1c0c8416b9fc6f907b7433") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  email                                           String                          @unique(map: "UQ_97672ac88f789774dd47f7c8be3") @db.VarChar
-  password                                        String?                         @db.VarChar
-  emailVerified                                   DateTime?                       @map("email_verified") @db.Timestamp(6)
-  createdAt                                       DateTime                        @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt                                       DateTime                        @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
-  role                                            String                          @default("user") @db.VarChar
-  status                                          String                          @default("pending") @db.VarChar
-  name                                            String                          @default("") @db.VarChar
-  username                                        String                          @unique(map: "UQ_fe0bb3f6520ee0469504521e710") @db.VarChar
-  diamonds                                        Int                             @default(0)
-  credential                                      credential[]
-  education                                       education[]
-  energies                                        energies?
-  experiences                                     experiences[]
-  user_daily_rewards                              user_daily_rewards[]
-  gameProgress                                    UserGameProgress[]              @relation("UserGameProgress")
-  user_profiles                                   Profile?
-  user_progress                                   UserProgress?
-  user_rewards_purchase_history                   user_rewards_purchase_history[]
-  user_socials                                    UserSocial[]
-  user_subscriptions                              user_subscriptions[]
-  users_friends_users_friends_initiator_idTousers UsersToFriends[]                @relation("users_friends_initiator_idTousers")
-  friends                                         UsersToFriends[]                @relation("UserFriends")
-  users_friends_users_friends_friend_idTousers    UsersToFriends[]                @relation("users_friends_friend_idTousers")
-  users_soft_skills                               UsersToSkills[]
-  verificationTokens                              UsersVerificationToken[]        @relation("UserVerificationTokens")
-
-  @@map("users")
-}
-
-model UserSocial {
-  id       String                 @id(map: "PK_b83c619b4b264f307240eb419ec") @default(dbgenerated("uuid_generate_v4()")) @map("id") @db.Uuid
-  socialId String                 @unique(map: "UQ_2632a167a414578b3bd0c2c543a") @map("social_id") @db.VarChar
-  type     user_socials_type_enum @map("type")
-  user_id  String                 @db.Uuid
-  users    User                   @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "FK_5c54c2fb2b23d26200fe67514bd")
-
-  @@map("user_socials")
+  id                 String                   @id @default(uuid()) @db.Uuid
+  email              String                   @unique()
+  password           String?                  @db.VarChar
+  emailVerified      DateTime?
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+  role               String                   @default("user")
+  status             String                   @default("pending")
+  name               String                   @default("")
+  username           String                   @unique()
+  userProfiles       Profile?
+  usersSoftSkills    UsersToSkills[]
+  verificationTokens UsersVerificationToken[] @relation("UserVerificationTokens")
 }
 
 model Profile {
-  id                  String                            @id(map: "PK_1ec6662219f4605723f1e41b6cb") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  age                 Int?
-  gender              user_profiles_gender_enum?
-  profileType         user_profiles_profile_type_enum?  @map("profile_type")
-  learningPace        user_profiles_learning_pace_enum? @map("learning_pace")
-  file_id             String?                           @unique(map: "UQ_3ad486d7e9d4f6f462c1830e0b2") @db.Uuid
-  user_id             String                            @unique(map: "UQ_6ca9503d77ae39b4b5a6cc3ba88") @db.Uuid
-  phoneNumber         String?                           @map("phone_number") @db.VarChar
-  profileLevel        Int                               @default(1) @map("profile_level")
-  rubies              Int                               @default(0)
-  exp                 Int                               @default(0)
-  energy              Int                               @default(0)
-  experience          Int                               @default(1000)
-  deleted             Int                               @default(0) @db.SmallInt
-  status              Int                               @default(1) @db.SmallInt
-  createdAt           DateTime?                         @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt           DateTime?                         @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
-  tickets             Int                               @default(0)
-  powers              Json?                             @default("[]") @db.Json
-  streakSaver         Int                               @default(0) @map("streak_saver")
-  eliteStatus         Int                               @default(0) @map("elite_status") @db.SmallInt
-  eliteSubscriptionId String?                           @map("elite_subscription_id") @db.VarChar
-  chestBoxes          Json?                             @default("{\"rare\":0,\"epic\":0,\"legendary\":0}") @map("chest_boxes") @db.Json
-  spentIn             DateTime?                         @map("spent_in") @db.Timestamp(6)
-  energyBackup        Int                               @default(0) @map("energy_backup")
-  files               files?                            @relation(fields: [file_id], references: [id], onUpdate: NoAction, map: "FK_3ad486d7e9d4f6f462c1830e0b2")
-  users               User                              @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_6ca9503d77ae39b4b5a6cc3ba88")
+  id          String                           @id @default(uuid()) @db.Uuid
+  age         Int?
+  gender      user_profiles_gender_enum?
+  profileType user_profiles_profile_type_enum?
+  userId      String                           @unique() @db.Uuid
+  phoneNumber String?
+  deleted     Int                              @default(0)
+  status      Int                              @default(1)
+  createdAt   DateTime?                        @default(now())
+  updatedAt   DateTime?                        @updatedAt
+  users       User                             @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  notificationsFrom   Notification[] @relation("FromUser")
-  notificationsTo     Notification[] @relation("ToUser")
-  @@map("user_profiles")
-}
-
-model UserProgress {
-  id         String    @id(map: "PK_7b5eb2436efb0051fdf05cbe839") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  level      Int       @default(1)
-  experience Int       @default(1000)
-  user_id    String    @unique(map: "REL_c41601eeb8415a9eb15c8a4e55") @db.Uuid
-  rubies     Int       @default(0)
-  exp        Int       @default(0)
-  energy     Int       @default(0)
-  powers     Json?     @default("{}") @db.Json
-  status     Int       @default(1)
-  createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt  DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
-  users      User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_c41601eeb8415a9eb15c8a4e557")
-
-  @@map("user_progress")
+  notificationsFrom Notification[] @relation("FromUser")
+  notificationsTo   Notification[] @relation("ToUser")
+  Notification      Notification[]
 }
 
 model UsersToSkills {
-  user_id       String    @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  soft_skill_id String    @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
-  id            String    @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  soft_skills   SoftSkill @relation(fields: [soft_skill_id], references: [id], onDelete: Cascade, map: "FK_52979b8024d9bdb1b8fcf9a0e28")
-  users         User      @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "FK_ef0549e4f36cde32a8d8f12a528")
+  id          String    @default(uuid()) @db.Uuid
+  userId      String    @default(uuid()) @db.Uuid
+  softSkillId String    @default(uuid()) @db.Uuid
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+  softSkills  SoftSkill @relation(fields: [softSkillId], references: [id], onDelete: Cascade)
+  users       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@id([user_id, soft_skill_id], map: "PK_80e8c793d037108daba229ab015")
-  @@map("users_soft_skills")
+  @@id([userId, softSkillId])
 }
 
 model SoftSkill {
-  id                String          @id(map: "PK_88c886b3eaaece0553df719bae1") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name              String          @unique(map: "UQ_3c913a9929456dcb626cf46f0a1") @db.VarChar
-  users_soft_skills UsersToSkills[]
-
-  @@map("soft_skills")
+  id              String          @id @default(uuid()) @db.Uuid
+  name            String          @unique()
+  usersSoftSkills UsersToSkills[]
 }
 
-model UserLeaderboards {
-  id        String    @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  exp       Int
-  status    Int       @default(1) @db.SmallInt
-  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
-  userId    String    @default(dbgenerated("uuid_generate_v4()")) @map("user_id") @db.Uuid
-
-  @@id([id, userId], map: "PK_9765cd64d8e094d147d025f1406")
-  @@map("user_leaderboards")
-}
-
-model UsersToFriends {
-  userId                                  String   @default(dbgenerated("uuid_generate_v4()")) @map("user_id") @db.Uuid
-  friendId                                String   @default(dbgenerated("uuid_generate_v4()")) @map("friend_id") @db.Uuid
-  createdAt                               DateTime @default(now()) @map("created_at") @db.Timestamp(6)
-  initiatorId                             String   @map("initiator_id") @db.Uuid
-  confirmed                               Boolean  @default(false)
-  users_users_friends_initiator_idTousers User     @relation("users_friends_initiator_idTousers", fields: [initiatorId], references: [id], onDelete: Cascade, map: "FK_3433a322621967fe462ae9e6a3a")
-  user                                    User     @relation("UserFriends", fields: [userId], references: [id], onDelete: Cascade, map: "FK_da2a42ba5b9efdff96e51933580")
-  users_users_friends_friend_idTousers    User     @relation("users_friends_friend_idTousers", fields: [friendId], references: [id], onDelete: Cascade, map: "FK_e34138e1a57cc876f9f0cf0f5a2")
-
-  @@id([userId, friendId], map: "PK_160752e50a8572eafe1100a3c25")
-  @@map("users_friends")
-}
-
-model UserGameProgress {
-  id                                  String    @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  userId                              String    @default(dbgenerated("uuid_generate_v4()")) @map("user_id") @db.Uuid
-  triviaCurrentGameLevelReached       Int       @default(0) @map("trivia_current_game_level_reached")
-  gridBasedCurrentGameLevelReached    Int       @default(0) @map("grid_based_current_game_level_reached")
-  learningPathCurrentGameLevelReached Int       @default(0) @map("learning_path_current_game_level_reached")
-  rolePlayingCurrentGameLevelReached  Int       @default(0) @map("role_playing_current_game_level_reached")
-  createdAt                           DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt                           DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
-  deleted                             Int       @default(0) @db.SmallInt
-  status                              Int       @default(1) @db.SmallInt
-  consecutiveRightAnswersCount        Json?     @default("{}") @map("consecutive_right_answers_count") @db.Json
-  user                                User      @relation("UserGameProgress", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_d2beffe7453e89628239465eae1")
-
-  @@id([id, userId], map: "PK_b93107c2c8bddd2a4ab9016b21e")
-  @@map("user_game_progress")
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Notification {
-  id                          String    @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @unique
-  userId                      String?   @map("user_id") @db.Uuid
-  fromUserId                  String?   @map("from_user_id") @db.Uuid
-  notificationMessage         String?   @map("notification_message")
-  notificationLink            String?   @map("notification_link") @db.VarChar(255)
-  userAction                  String    @default("unread") @map("user_action") @db.VarChar(20)
-  expiryDate                  DateTime? @map("expiry_date") @db.Timestamp(6)
+  id                          String    @id @default(uuid()) @db.Uuid
+  userId                      String?   @db.Uuid
+  fromUserId                  String?   @db.Uuid
+  notificationMessage         String?
+  notificationLink            String?
+  userAction                  String    @default("unread")
+  expiryDate                  DateTime?
   status                      Boolean?  @default(true)
-  createdAt                   DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt                   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
-  userRequestAction           String    @default("no-action") @map("user_request_action") @db.VarChar(30)
-  systemNotificationReadedBy  String?   @map("system_notification_readed_by")
-  systemNotificationDeletedBy String?   @map("system_notification_deleted_by")
-  notificationTypeId          String?   @map("notification_type_id") @db.Uuid
-  groupId                     String?   @map("group_id") @db.Uuid
+  createdAt                   DateTime  @default(now())
+  updatedAt                   DateTime  @updatedAt
+  userRequestAction           String    @default("no-action")
+  systemNotificationReadedBy  String?
+  systemNotificationDeletedBy String?
+  notificationTypeId          String?   @db.Uuid
+  groupId                     String?   @db.Uuid
 
-  notificationType            NotificationType?        @relation("TypeOfNotification",fields: [notificationTypeId], references: [id])
-  fromUser                    Profile?                 @relation("FromUser", fields: [fromUserId], references: [id])
-  toUser                      Profile?                 @relation("ToUser", fields: [userId], references: [id])
-  @@map("notifications")
+  notificationType NotificationType? @relation("TypeOfNotification", fields: [notificationTypeId], references: [id])
+  fromUser         Profile?          @relation("FromUser", fields: [fromUserId], references: [id])
+  toUser           Profile?          @relation("ToUser", fields: [userId], references: [id])
+  Profile          Profile?          @relation(fields: [profileId], references: [id])
+  profileId        String?           @db.Uuid
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model NotificationType {
-  id                String   @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @unique
-  notificationName  String   @map("notification_name") @db.VarChar(255)
-  isSystemGenerated Boolean? @default(false) @map("is_system_generated")
-  status            Boolean? @default(true)
-  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt         DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
-
+  id                String         @id @default(uuid()) @db.Uuid
+  notificationName  String         @unique
+  isSystemGenerated Boolean?       @default(false)
+  status            Boolean?       @default(true)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @default(now()) @updatedAt
   notifications     Notification[] @relation("TypeOfNotification")
-  @@map("notification_types")
 }
 
 model UsersVerificationToken {
-  id           String    @id(map: "PK_89e8a37ed0f9e05b477bca81e71") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  type         String    @db.VarChar
-  submitted_at DateTime  @default(now()) @db.Timestamp(6)
-  token        String?   @db.VarChar
-  expire_at    DateTime? @default(now()) @db.Timestamp(6)
-  userId       String    @map("user_id") @db.Uuid
-  user         User      @relation("UserVerificationTokens", fields: [userId], references: [id], onDelete: Cascade, map: "FK_51ed3e55a36e8100aac43e8383f")
-
-  @@unique([userId, type], map: "IDX_488c35bac4fae1d53ac47eb68b")
-  @@map("users_verification_tokens")
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model achievements {
-  id                   String   @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  achievement_name     String   @db.VarChar(255)
-  description          String?
-  reward               String?
-  soft_skill_catgories String?
-  soft_skill_list      String?
-  chest_box_id         String?  @db.Uuid
-  energy_refill        String?  @db.VarChar(20)
-  type                 String?  @db.VarChar(20)
-  status               Boolean? @default(true)
-  created_at           DateTime @default(now()) @db.Timestamp(6)
-  updated_at           DateTime @default(now()) @db.Timestamp(6)
-
-  @@ignore
-}
-
-model banner {
-  id         String   @id(map: "PK_ee89d2183eefc83d695e6c6ad89") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  type       String   @db.VarChar
-  name       String   @db.VarChar
-  path       String   @db.VarChar
-  mimetype   String   @db.VarChar
-  size       Int
-  created_at DateTime @default(now()) @db.Timestamp(6)
-  updated_at DateTime @default(now()) @db.Timestamp(6)
-}
-
-model credential {
-  id                  String    @id(map: "PK_3a5169bcd3d5463cefeec78be82") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name                String    @db.VarChar
-  issuingOrganization String    @db.VarChar
-  startDate           DateTime  @db.Date
-  endDate             DateTime? @db.Date
-  credentialId        String    @db.VarChar
-  userId              String    @db.Uuid
-  users               User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_51dc2344d47cea3102674c64963")
-}
-
-model daily_rewards {
-  id         Int      @id(map: "PK_daily_rewards_id") @default(autoincrement())
-  rewards    Json?    @default("[]") @db.Json
-  deleted    Int?     @default(0) @db.SmallInt
-  status     Int?     @default(1) @db.SmallInt
-  created_at DateTime @default(now()) @db.Timestamp(6)
-  updated_at DateTime @default(now()) @db.Timestamp(6)
-}
-
-model education {
-  id           String    @id(map: "PK_bf3d38701b3030a8ad634d43bd6") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  school       String    @db.VarChar
-  degree       String    @db.VarChar
-  fieldOfStudy String    @db.VarChar
-  startDate    DateTime  @db.Date
-  endDate      DateTime? @db.Date
+  id           String    @id @default(uuid()) @db.Uuid
+  type         String
+  submitted_at DateTime  @default(now())
+  token        String?
+  expire_at    DateTime? @default(now())
   userId       String    @db.Uuid
-  users        User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_723e67bde13b73c5404305feb14")
-}
+  user         User      @relation("UserVerificationTokens", fields: [userId], references: [id], onDelete: Cascade)
 
-model energies {
-  id       String    @id(map: "PK_c226e6bdb48f4d80892c143337b") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  energy   Int       @default(3)
-  spent_in DateTime? @db.Timestamp(6)
-  user_id  String    @unique(map: "REL_5aa756b440792944d4d1eeae5f") @db.Uuid
-  users    User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_5aa756b440792944d4d1eeae5fc")
-}
-
-model experiences {
-  id          String    @id(map: "PK_experiences_id") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  title       String    @db.VarChar
-  companyName String    @db.VarChar
-  location    String    @db.VarChar
-  startDate   DateTime  @db.Date
-  endDate     DateTime? @db.Date
-  description String
-  userId      String?   @db.Uuid
-  users       User?     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_user_experiences")
-}
-
-model files {
-  id            String   @id(map: "PK_6c16b9093a142e0e7613b04a3d9") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name          String   @unique(map: "UQ_332d10755187ac3c580e21fbc02") @db.VarChar
-  path          String   @db.VarChar
-  mimetype      String   @db.VarChar
-  size          Int
-  created_at    DateTime @default(now()) @db.Timestamp(6)
-  updated_at    DateTime @default(now()) @db.Timestamp(6)
-  user_profiles Profile?
-
-  @@index([name], map: "IDX_332d10755187ac3c580e21fbc0")
-}
-
-model game_levels {
-  level           Int
-  level_data      Json     @db.Json
-  reward          Json     @db.Json
-  penalty_exp     Int
-  created_at      DateTime @db.Timestamp(6)
-  updated_at      DateTime @db.Timestamp(6)
-  soft_skill_list Json     @db.Json
-  deleted         Int      @default(0) @db.SmallInt
-  status          Int      @default(1) @db.SmallInt
-  id              String   @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  game_id         String   @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  games           games    @relation(fields: [game_id], references: [id], onDelete: Cascade, map: "FK_dce941cc3798d87e1e58e87a488")
-
-  @@id([id, game_id], map: "PK_a133ce2b62fe113e31a77573b49")
-}
-
-model game_rooms {
-  id                String   @id(map: "PK_026d3197a67b9676bc09a996d98") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  members           Int
-  scenario          String
-  language          String
-  difficulty_level  String
-  verification_code Int
-  soft_skill_list   Json     @db.Json
-  deleted           Int      @default(0) @db.SmallInt
-  status            Int      @default(1) @db.SmallInt
-  created_at        DateTime @db.Timestamp(6)
-  updated_at        DateTime @db.Timestamp(6)
-}
-
-model games {
-  game_type             String
-  description           String
-  reward                Json          @db.Json
-  soft_skill_categories String
-  created_at            DateTime      @db.Timestamp(6)
-  updated_at            DateTime      @db.Timestamp(6)
-  is_locked             Int           @default(0)
-  deleted               Int           @default(0) @db.SmallInt
-  status                Int           @default(1) @db.SmallInt
-  total_levels          Int           @default(0)
-  id                    String        @id(map: "PK_c9b16b62917b5595af982d66337") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name                  String        @default("")
-  soft_skill_list       Json          @db.Json
-  game_levels           game_levels[]
-}
-
-model lucky_machine {
-  id            Int      @id(map: "PK_lucky_machine_id") @default(autoincrement())
-  product_type  String   @db.VarChar
-  chestbox_type String?  @default("") @db.VarChar
-  image_url     String   @db.VarChar
-  qty           Int?     @default(1)
-  probability   Float
-  deleted       Int?     @default(0) @db.SmallInt
-  status        Int?     @default(1) @db.SmallInt
-  created_at    DateTime @default(now()) @db.Timestamp(6)
-  updated_at    DateTime @default(now()) @db.Timestamp(6)
-}
-
-model migrations {
-  id        Int    @id(map: "PK_8c82d7f526340ab734260ea46be") @default(autoincrement())
-  timestamp BigInt
-  name      String @db.VarChar
-}
-
-model session {
-  sid    String   @id @db.VarChar
-  sess   Json     @db.Json
-  expire DateTime @db.Timestamp(6)
-
-  @@index([expire], map: "IDX_session_expire")
-}
-
-model store_product_category {
-  id                   Int              @id(map: "PK_product_category_id") @default(autoincrement())
-  category_name        String           @unique(map: "UQ_category_name") @db.VarChar
-  category_description String
-  category_label       String           @unique(map: "UQ_category_label") @db.VarChar(50)
-  deleted              Int?             @default(0) @db.SmallInt
-  status               Int?             @default(1) @db.SmallInt
-  created_at           DateTime         @default(now()) @db.Timestamp(6)
-  updated_at           DateTime         @default(now()) @db.Timestamp(6)
-  store_products       store_products[]
-}
-
-model store_products {
-  id                        Int                    @id(map: "PK_store_products") @default(autoincrement())
-  store_product_category_id Int
-  product_name              String                 @db.VarChar
-  expiry_date_time          DateTime?              @db.Timestamp(6)
-  price                     Decimal                @db.Decimal(10, 2)
-  price_type                String                 @db.VarChar
-  image_url                 String?                @db.VarChar
-  deleted                   Int?                   @default(0) @db.SmallInt
-  status                    Int?                   @default(1) @db.SmallInt
-  created_at                DateTime               @default(now()) @db.Timestamp(6)
-  updated_at                DateTime               @default(now()) @db.Timestamp(6)
-  offer_label               String?                @db.VarChar
-  features                  Json?                  @default("{}") @db.Json
-  chest_boxes_type          String?                @default("") @db.VarChar
-  store_product_category    store_product_category @relation(fields: [store_product_category_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_store_products_category_id")
-}
-
-model subscription_pack {
-  id                   Int      @id(map: "PK_subscription_pack") @default(autoincrement())
-  title                String   @db.VarChar
-  price_id             String   @db.VarChar
-  subscription_type    String   @db.VarChar
-  subscription_details Json?    @default("{}") @db.Json
-  extra_details        Json?    @default("{}") @db.Json
-  deleted              Int?     @default(0) @db.SmallInt
-  status               Int?     @default(1) @db.SmallInt
-  created_at           DateTime @default(now()) @db.Timestamp(6)
-  updated_at           DateTime @default(now()) @db.Timestamp(6)
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model trivia_questions {
-  question_text  String
-  option_a       String
-  option_b       String
-  option_c       String
-  option_d       String
-  status         Int      @default(1)
-  created_at     DateTime @db.Timestamp(6)
-  updated_at     DateTime @db.Timestamp(6)
-  level          Int
-  image_url      String
-  hint           String
-  correct_answer String
-  is_reported    Int      @default(0) @db.SmallInt
-  deleted        Int      @default(0) @db.SmallInt
-  topic          String
-  explain        String
-  id             String   @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model user_achievements {
-  id                         String    @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id                    String    @db.Uuid
-  achievement_id             String    @db.Uuid
-  current_status             String?   @default("in_progress") @db.VarChar(20)
-  completed_date             DateTime? @db.Timestamp(6)
-  achievement_progress_count Int       @default(0)
-  progress_percentage        Int       @default(0)
-  rewards_done               Boolean?  @default(false)
-  status                     Boolean?  @default(true)
-  created_at                 DateTime  @default(now()) @db.Timestamp(6)
-  updated_at                 DateTime  @default(now()) @db.Timestamp(6)
-
-  @@ignore
-}
-
-model user_daily_rewards {
-  id         Int      @id @default(autoincrement())
-  day        Int
-  user_id    String   @db.Uuid
-  rewards    Json?    @default("{}") @db.Json
-  deleted    Int?     @default(0) @db.SmallInt
-  status     Int?     @default(1) @db.SmallInt
-  created_at DateTime @default(now()) @db.Timestamp(6)
-  updated_at DateTime @default(now()) @db.Timestamp(6)
-  users      User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_user_daily_rewards_usee_id")
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model user_notification_groups {
-  id          String   @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @unique
-  name        String   @db.VarChar(255)
-  description String?
-  condition   String?
-  status      Boolean? @default(true)
-  created_at  DateTime @default(now()) @db.Timestamp(6)
-  updated_at  DateTime @default(now()) @db.Timestamp(6)
-}
-
-model user_payment_history {
-  id              Int      @id(map: "PK_user_payment_history") @default(autoincrement())
-  user_id         String   @db.Uuid
-  product_details Json?    @default("{}") @db.Json
-  payment_details Json?    @default("{}") @db.Json
-  deleted         Int?     @default(0) @db.SmallInt
-  status          Int?     @default(1) @db.SmallInt
-  created_at      DateTime @default(now()) @db.Timestamp(6)
-  updated_at      DateTime @default(now()) @db.Timestamp(6)
-}
-
-model user_play_histories {
-  id                String    @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id           String    @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  game_level_status String    @default("IN_PROGRESS")
-  played_start_time DateTime  @db.Timestamp(6)
-  played_end_time   DateTime  @db.Timestamp(6)
-  game_data         Json      @default("{}") @db.Json
-  reward            Json      @default("{}") @db.Json
-  soft_skill_list   Json      @default("[]") @db.Json
-  penalty_exp       Int       @default(0) @db.SmallInt
-  status            Int       @default(1) @db.SmallInt
-  created_at        DateTime? @default(now()) @db.Timestamp(6)
-  updated_at        DateTime? @default(now()) @db.Timestamp(6)
-  game_level_id     String    @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-
-  @@id([id, user_id, game_level_id], map: "PK_a52d4cb42c8205a432202b83e07")
-}
-
-model user_play_history {
-  id                String    @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id           String    @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  game_id           String    @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  level             Int
-  game_level_status String    @default("IN_PROGRESS")
-  reward            Json      @default("{}") @db.Json
-  skill_list        Json      @default("[]") @db.Json
-  penalty_exp       Int       @default(0)
-  status            Int       @default(1)
-  created_at        DateTime? @default(now()) @db.Timestamp(6)
-  updated_at        DateTime? @default(now()) @db.Timestamp(6)
-
-  @@id([id, user_id, game_id], map: "PK_1a2bc9705c741b214bd8d294689")
-}
-
-model user_rewards_purchase_history {
-  id                  Int      @id @default(autoincrement())
-  user_id             String   @db.Uuid
-  rewards_or_purchase String   @db.VarChar
-  details             Json?    @default("{}") @db.Json
-  deleted             Int?     @default(0) @db.SmallInt
-  status              Int?     @default(1) @db.SmallInt
-  created_at          DateTime @default(now()) @db.Timestamp(6)
-  updated_at          DateTime @default(now()) @db.Timestamp(6)
-  users               User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_user_rewards_purchase_user_id")
-}
-
-model user_subscriptions {
-  id            String   @id(map: "PK_9e928b0954e51705ab44988812c") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  metadata      Json?    @db.Json
-  description   String?
-  paymentMethod String   @db.VarChar
-  type          String   @db.VarChar
-  name          String   @db.VarChar
-  start_at      DateTime @db.Timestamp(6)
-  end_at        DateTime @db.Timestamp(6)
-  created_at    DateTime @default(now()) @db.Timestamp(6)
-  updated_at    DateTime @default(now()) @db.Timestamp(6)
-  user_id       String   @db.Uuid
-  users         User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_0641da02314913e28f6131310eb")
+  @@unique([userId, type])
+  @@map("users_verification_tokens")
 }
 
 enum user_profiles_gender_enum {
@@ -566,20 +118,7 @@ enum user_profiles_gender_enum {
   other
 }
 
-enum user_profiles_learning_pace_enum {
-  relaxed
-  ambitious
-  focused
-}
-
 enum user_profiles_profile_type_enum {
   student
   professional
-  careerShifter
-}
-
-enum user_socials_type_enum {
-  google
-  linkedin
-  facebook
 }

@@ -1,91 +1,78 @@
-'use client'
-import { useState, useEffect } from 'react'
-import { XMarkIcon, UserIcon, PuzzlePieceIcon, BellIcon } from '@heroicons/react/24/outline'
-import Cookies from 'js-cookie'
+'use client';
+
+import { useState, useEffect } from 'react';
+import {
+  XMarkIcon,
+  BellIcon,
+} from '@heroicons/react/24/outline';
+import Cookies from 'js-cookie';
+import NotificationItem from '@/components/NotificationItem';
+import { toast } from 'react-toastify';
 
 interface Notification {
-  id: string
-  notificationMessage: string
-  createdAt: string
+  id: string;
+  notificationMessage: string;
+  createdAt: string;
   notificationType: {
-    notificationName: string
-  }
-  userRequestAction: string
+    notificationName: string;
+  };
+  userRequestAction: string;
 }
 
 interface NotificationsResponse {
   todays: {
-    total: number
-    data: Notification[]
-  }
+    total: number;
+    data: Notification[];
+  };
   others: {
-    total: number
-    data: Notification[]
-  }
-  unreadCount: number
+    total: number;
+    data: Notification[];
+  };
+  unreadCount: number;
 }
 
 export default function NotificationsComponent() {
-  const [notifications, setNotifications] = useState<NotificationsResponse | null>(null)
-  const [isOpen, setIsOpen] = useState(false)
+  const [notifications, setNotifications] = useState<NotificationsResponse | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    fetchNotifications()
-  }, [])
+    const fetchNotifications = async () => {
+      try {
+        const accessToken = Cookies.get('accessToken');
 
-  const fetchNotifications = async () => {
-    try {
-      const accessToken = Cookies.get('accessToken')
-      
-      if (!accessToken) {
-        console.error('No access token found')
-        return
-      }
-
-      const response = await fetch('/api/notification', {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
+        if (!accessToken) {
+          toast.error('No access token found!');
+          return;
         }
-      })
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch notifications')
+        const response = await fetch('/api/notification', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch notifications');
+        }
+
+        const data = await response.json();
+        setNotifications(data);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          toast.error(`Error fetching notifications:', ${error}`);
+        } else {
+          toast.error('Error fetching notifications');
+        }
       }
+    };
 
-      const data = await response.json()
-      setNotifications(data)
-    } catch (error) {
-      console.error('Error fetching notifications:', error)
-    }
-  }
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }).toUpperCase()
-  }
-
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case 'Friend Request':
-      case 'Friend Request Accepted':
-        return <UserIcon className="w-10 h-10 text-white" />
-      case 'Game Request':
-        return <PuzzlePieceIcon className="w-10 h-10 text-white" />
-      default:
-        return <UserIcon className="w-10 h-10 text-white" />
-    }
-  }
-
-  const getStatusTag = (action: string) => {
-    if (action === 'accepted') {
-      return <span className="px-2 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded-full">ACCEPTED</span>
-    }
-    return null
-  }
+    fetchNotifications();
+  }, []);
 
   return (
     <div>
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
       >
@@ -95,14 +82,17 @@ export default function NotificationsComponent() {
             {notifications.unreadCount}
           </span>
         )}
-
       </button>
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-5 flex items-start justify-start ml-[5%] pl-5 z-50">
           <div className="bg-white rounded-2xl shadow-xl w-96 max-h-[80vh] overflow-hidden mt-20 mr-4">
             <div className="flex items-center justify-between p-4">
               <h2 className="text-xl font-semibold">Notifications</h2>
-              <button onClick={() => setIsOpen(false)} className="text-gray-500 hover:text-gray-700">
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
                 <XMarkIcon className="w-6 h-6" />
               </button>
             </div>
@@ -111,17 +101,27 @@ export default function NotificationsComponent() {
                 <>
                   {notifications.todays.total > 0 && (
                     <div className="p-4">
-                      <h3 className="text-sm font-semibold text-gray-500 mb-2">TODAY</h3>
+                      <h3 className="text-sm font-semibold text-gray-500 mb-2">
+                        TODAY
+                      </h3>
                       {notifications.todays.data.map((notification) => (
-                        <NotificationItem key={notification.id} notification={notification} />
+                        <NotificationItem
+                          key={notification.id}
+                          notification={notification}
+                        />
                       ))}
                     </div>
                   )}
                   {notifications.others.total > 0 && (
                     <div className="p-4">
-                      <h3 className="text-sm font-semibold text-gray-500 mb-2">OLDER</h3>
+                      <h3 className="text-sm font-semibold text-gray-500 mb-2">
+                        OLDER
+                      </h3>
                       {notifications.others.data.map((notification) => (
-                        <NotificationItem key={notification.id} notification={notification} />
+                        <NotificationItem
+                          key={notification.id}
+                          notification={notification}
+                        />
                       ))}
                     </div>
                   )}
@@ -132,20 +132,5 @@ export default function NotificationsComponent() {
         </div>
       )}
     </div>
-  )
-
-  function NotificationItem({ notification }: { notification: Notification }) {
-    return (
-      <div className="flex items-start space-x-3 mb-4">
-        <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-          {getNotificationIcon(notification.notificationType.notificationName)}
-        </div>
-        <div className="flex-1">
-          <p className="text-sm font-medium">{notification.notificationMessage}</p>
-          <p className="text-xs text-gray-500">{formatDate(notification.createdAt)}</p>
-        </div>
-        {getStatusTag(notification.userRequestAction)}
-      </div>
-    )
-  }
+  );
 }

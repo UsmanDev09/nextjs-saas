@@ -1,4 +1,7 @@
-export default interface IAuthState {
-  isResetPasswordSent: boolean;
-  isLoggedIn: boolean;
+export interface IProfile {
+  profile: {
+    id: number | null
+    name: string
+    username: string
+  }
 }
