@@ -2,11 +2,7 @@ import { ToastContainer } from 'react-toastify';
 
 export function StyledToastContainer() {
   return (
-    <ToastContainer
-      position="top-center"
-      closeButton={false}
-      hideProgressBar
-    />
+    <ToastContainer position="top-center" closeButton={false} hideProgressBar />
   );
 }
 

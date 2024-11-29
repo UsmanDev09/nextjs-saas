@@ -1,8 +1,18 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+import { signIn } from 'next-auth/react';
 import React from 'react';
 
 function LinkedInSvg() {
+  const loginWithLinkedin = async () => {
+    try {
+      await signIn('linkedin', { callbackUrl: '/admin' });
+    } catch (error) {
+      console.error('Linkedin Sign-In Error:', error);
+    }
+  };
   return (
-    <div>
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+    <div onClick={loginWithLinkedin}>
       <svg
         className="w-6 h-6"
         viewBox="0 0 24 24"

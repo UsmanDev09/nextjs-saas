@@ -51,14 +51,23 @@ function StripePayment() {
       const result = await response.json();
       window.location.href = result.url;
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'An error occured during checkout');
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'An error occured during checkout',
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <button type="submit" onClick={onSubmit} disabled={isLoading} className="bg-primary text-primary-foreground hover:bg-primary/90">
+    <button
+      type="submit"
+      onClick={onSubmit}
+      disabled={isLoading}
+      className="bg-primary text-primary-foreground hover:bg-primary/90"
+    >
       {isLoading ? 'Processing...' : 'Test Stripe'}
     </button>
   );

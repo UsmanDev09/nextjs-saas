@@ -9,7 +9,7 @@ function EyeIcon({
   direction = 'up',
   className,
   ...rest
-} : ISvgProps) {
+}: ISvgProps) {
   const [iconClassName, setIconClassName] = useState('');
 
   useEffect(() => {

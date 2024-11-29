@@ -1,10 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import {
-  XMarkIcon,
-  BellIcon,
-} from '@heroicons/react/24/outline';
+import { XMarkIcon, BellIcon } from '@heroicons/react/24/solid';
 import Cookies from 'js-cookie';
 import NotificationItem from '@/components/NotificationItem';
 import { toast } from 'react-toastify';
@@ -32,7 +29,8 @@ interface NotificationsResponse {
 }
 
 export default function NotificationsComponent() {
-  const [notifications, setNotifications] = useState<NotificationsResponse | null>(null);
+  const [notifications, setNotifications] =
+    useState<NotificationsResponse | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -41,7 +39,7 @@ export default function NotificationsComponent() {
         const accessToken = Cookies.get('accessToken');
 
         if (!accessToken) {
-          toast.error('No access token found!');
+          // toast.error('No access token found!');
           return;
         }
 

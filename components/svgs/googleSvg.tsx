@@ -7,11 +7,21 @@ function GoogleSvg() {
     try {
       await signIn('google', { callbackUrl: '/admin' });
     } catch (error) {
-      toast(error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.');
+      toast(
+        error instanceof Error
+          ? error.message
+          : 'An unexpected error occurred. Please try again.',
+      );
     }
   };
   return (
-    <div role="button" tabIndex={0} aria-label="Svg" onKeyDown={() => console.log('pressed')} onClick={loginWithGoogle}>
+    <div
+      role="button"
+      tabIndex={0}
+      aria-label="Svg"
+      onKeyDown={() => console.log('pressed')}
+      onClick={loginWithGoogle}
+    >
       <svg
         className="w-6 h-6"
         viewBox="0 0 24 24"

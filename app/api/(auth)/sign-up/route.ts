@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email and password are required' },
-        { status: 422 },
+        { status: 422 }
       );
     }
 
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     if (existingUser) {
       return NextResponse.json(
         { error: 'Email already in use' },
-        { status: 409 },
+        { status: 409 }
       );
     }
 
@@ -42,8 +42,7 @@ export async function POST(req: NextRequest) {
         username,
         password: hashedPassword,
         userProfiles: {
-          create: {
-          },
+          create: {},
         },
       },
       select: {
@@ -71,21 +70,19 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       {
-        message: 'User created successfully. Please check your email to verify.',
+        message:
+          'User created successfully. Please check your email to verify.',
       },
-      { status: 201 },
+      { status: 201 }
     );
   } catch (error) {
     if (error instanceof Error) {
       return NextResponse.json(
         { error: `Error signing up: ${error.message}` },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
-    return NextResponse.json(
-      { error: 'Error signing up' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Error signing up' }, { status: 500 });
   }
 }

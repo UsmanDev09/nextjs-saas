@@ -53,6 +53,8 @@ export default function OnboardingForm() {
       importantSkills: [],
       userCategory: '',
     },
+    validateOnBlur: true,
+    validateOnChange: true,
     validationSchema: Yup.object({
       name: Yup.string().required('Name is required'),
       age: Yup.number()
@@ -60,7 +62,6 @@ export default function OnboardingForm() {
         .positive('Age must be positive')
         .integer('Age must be a number'),
       gender: Yup.string().required('Gender is required'),
-      learningPace: Yup.string().required('Learning pace is required'),
       userCategory: Yup.string().required('User category is required'),
       importantSkills: Yup.array()
         .min(1, 'Select at least one skill')
@@ -76,8 +77,9 @@ export default function OnboardingForm() {
           softSkills: values.importantSkills,
         };
 
-        const res = await axios.put('/api/profile/onboarding', apiBody);
-        console.log(res);
+        await axios.put('/api/profile/onboarding', apiBody);
+        toast.success('Profile created successfully');
+        // Additional success handling (e.g., redirect)
       } catch (error) {
         let errorMessage;
         if (axios.isAxiosError(error) && error.response) {
@@ -85,7 +87,7 @@ export default function OnboardingForm() {
         } else if (error instanceof Error) {
           errorMessage = error.message;
         } else {
-          errorMessage = 'An unexpected error occured';
+          errorMessage = 'An unexpected error occurred';
         }
 
         toast.error(errorMessage);
@@ -93,7 +95,46 @@ export default function OnboardingForm() {
     },
   });
 
-  const handleNext = () => setStep((prev) => Math.min(prev + 1, steps.length));
+  const handleNext = () => {
+    let isStepValid = false;
+
+    // eslint-disable-next-line default-case
+    switch (step) {
+      case 1:
+        isStepValid =
+          formik.values.name.trim() !== '' &&
+          formik.values.age !== '' &&
+          formik.values.gender.trim() !== '' &&
+          !formik.errors.name &&
+          !formik.errors.age &&
+          !formik.errors.gender;
+        break;
+
+      case 2:
+        isStepValid =
+          formik.values.importantSkills.length > 0 &&
+          formik.values.importantSkills.length <= 3;
+        break;
+
+      case 3:
+        isStepValid = formik.values.userCategory.trim() !== '';
+        break;
+    }
+
+    if (isStepValid) {
+      setStep((prev) => Math.min(prev + 1, steps.length));
+    } else {
+      formik.validateForm();
+      formik.setTouched({
+        name: step === 1,
+        age: step === 1,
+        gender: step === 1,
+        importantSkills: step === 2,
+        userCategory: step === 3,
+      });
+    }
+  };
+
   const handleBack = () => setStep((prev) => Math.max(prev - 1, 1));
 
   const handleSkillToggle = (skill: string) => {
@@ -101,7 +142,7 @@ export default function OnboardingForm() {
       'importantSkills',
       formik.values.importantSkills.includes(skill)
         ? formik.values.importantSkills.filter((s) => s !== skill)
-        : [...formik.values.importantSkills, skill].slice(0, 3),
+        : [...formik.values.importantSkills, skill].slice(0, 3)
     );
   };
 
@@ -111,41 +152,50 @@ export default function OnboardingForm() {
         return (
           <>
             <div className="relative">
-              <UserIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+              <UserIcon className="w-5 h-5 text-gray-400 absolute left-3 top-5 transform -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 name="name"
                 value={formik.values.name}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="Full Name"
               />
-              {formik.touched.name && formik.errors.name && (
-                <div className="text-red-500 text-sm">{formik.errors.name}</div>
-              )}
+              <div>
+                {formik.touched.name && formik.errors.name && (
+                  <div className="text-red-500 text-sm">
+                    {formik.errors.name}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="relative">
-                <CalendarIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                <CalendarIcon className="w-5 h-5 text-gray-400 absolute left-3 top-5 transform -translate-y-1/2 pointer-events-none" />
                 <input
                   type="number"
                   name="age"
                   value={formik.values.age}
                   onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                   className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Age"
                 />
-                {formik.touched.age && formik.errors.age && (
-                  <div className="text-red-500 text-sm">
-                    {formik.errors.age}
-                  </div>
-                )}
+                <div>
+                  {formik.touched.age && formik.errors.age && (
+                    <div className="text-red-500 text-sm">
+                      {formik.errors.age}
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="relative">
                 <select
                   name="gender"
                   value={formik.values.gender}
                   onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                   className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
                 >
                   <option value="">Select Gender</option>
@@ -153,12 +203,14 @@ export default function OnboardingForm() {
                   <option value="Female">Female</option>
                   <option value="Other">Other</option>
                 </select>
-                <ChevronDownIcon className="w-5 h-5 text-gray-400 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
-                {formik.touched.gender && formik.errors.gender && (
-                  <div className="text-red-500 text-sm">
-                    {formik.errors.gender}
-                  </div>
-                )}
+                <ChevronDownIcon className="w-5 h-5 text-gray-400 absolute right-3 top-5 transform -translate-y-1/2 pointer-events-none" />
+                <div className="h-5 mt-1">
+                  {formik.touched.gender && formik.errors.gender && (
+                    <div className="text-red-500 text-sm">
+                      {formik.errors.gender}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </>
@@ -185,12 +237,14 @@ export default function OnboardingForm() {
                 </button>
               ))}
             </div>
-            {formik.touched.importantSkills
-              && formik.errors.importantSkills && (
-                <div className="text-red-500 text-sm text-center mt-2">
-                  {formik.errors.importantSkills}
-                </div>
-            )}
+            <div className="h-5 mt-2 text-center">
+              {formik.touched.importantSkills &&
+                formik.errors.importantSkills && (
+                  <div className="text-red-500 text-sm">
+                    {formik.errors.importantSkills}
+                  </div>
+                )}
+            </div>
           </div>
         );
       case 3:
@@ -210,11 +264,13 @@ export default function OnboardingForm() {
                 {category}
               </button>
             ))}
-            {formik.touched.userCategory && formik.errors.userCategory && (
-              <div className="text-red-500 text-sm text-center mt-2">
-                {formik.errors.userCategory}
-              </div>
-            )}
+            <div className="h-5 mt-2 text-center">
+              {formik.touched.userCategory && formik.errors.userCategory && (
+                <div className="text-red-500 text-sm">
+                  {formik.errors.userCategory}
+                </div>
+              )}
+            </div>
           </div>
         );
       default:

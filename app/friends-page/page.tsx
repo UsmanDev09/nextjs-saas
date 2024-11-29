@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  MagnifyingGlassIcon,
-} from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
 
@@ -63,10 +61,12 @@ export default function FriendsComponent() {
     }
   }, [isOpen, fetchFriends]);
 
-  const filteredFriends = friends?.items?.filter(
-    (friend) => friend.name.toLowerCase().includes(searchTerm.toLowerCase())
-        || friend.username.toLowerCase().includes(searchTerm.toLowerCase()),
-  ) || [];
+  const filteredFriends =
+    friends?.items?.filter(
+      (friend) =>
+        friend.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        friend.username.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || [];
 
   return (
     <div>
@@ -120,10 +120,7 @@ export default function FriendsComponent() {
                 </div>
                 <div className="flex-grow">
                   <p className="font-medium">{friend.name}</p>
-                  <p className="text-sm text-gray-500">
-                    @
-                    {friend.username}
-                  </p>
+                  <p className="text-sm text-gray-500">@{friend.username}</p>
                 </div>
                 <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
                   <span className="text-sm font-medium text-purple-700">

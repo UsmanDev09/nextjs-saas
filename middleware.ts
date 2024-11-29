@@ -1,3 +1,4 @@
+/* eslint-disable default-case */
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -5,8 +6,14 @@ function validateEmail(email: string) {
   return email && email.includes('@');
 }
 
-function validateConfirmEmailCode(code: string) {
-  return code && code.length >= 5;
+function validateConfirmEmailCode(userId: string, token: string): boolean {
+  if (!userId || userId.trim().length === 0) {
+    return false;
+  }
+  if (!token || token.trim().length < 5) {
+    return false;
+  }
+  return true;
 }
 
 function validateToken(token: string) {
@@ -18,6 +25,19 @@ function validatePassword(password: string) {
 }
 
 export async function middleware(request: NextRequest) {
+  const res = NextResponse.next();
+
+  // add the CORS headers to the response
+  res.headers.append('Access-Control-Allow-Credentials', 'true');
+  res.headers.append('Access-Control-Allow-Origin', '*');
+  res.headers.append(
+    'Access-Control-Allow-Methods',
+    'GET,DELETE,PATCH,POST,PUT'
+  );
+  res.headers.append(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
   const { pathname } = request.nextUrl;
 
   if (
@@ -32,14 +52,14 @@ export async function middleware(request: NextRequest) {
     const body = await request.json();
     const checkExtraFields = (allowedFields: string[]) => {
       const extraFields = Object.keys(body).filter(
-        (field) => !allowedFields.includes(field),
+        (field) => !allowedFields.includes(field)
       );
       if (extraFields.length > 0) {
         return NextResponse.json(
           {
             errors: [{ msg: `Unexpected field(s): ${extraFields.join(', ')}` }],
           },
-          { status: 400 },
+          { status: 400 }
         );
       }
       return null;
@@ -57,21 +77,21 @@ export async function middleware(request: NextRequest) {
         if (!validateEmail(email)) {
           return NextResponse.json(
             { error: 'Invalid email format' },
-            { status: 400 },
+            { status: 400 }
           );
         }
 
         if (!password || password.length < 8) {
           return NextResponse.json(
             { error: 'Password must be at least 8 characters long' },
-            { status: 400 },
+            { status: 400 }
           );
         }
 
         if (password !== confirmPassword) {
           return NextResponse.json(
             { error: 'Passwords do not match' },
-            { status: 400 },
+            { status: 400 }
           );
         }
         break;
@@ -84,29 +104,29 @@ export async function middleware(request: NextRequest) {
         if (!email || !password) {
           return NextResponse.json(
             { error: 'Email and password are required' },
-            { status: 400 },
+            { status: 400 }
           );
         }
 
         if (!validateEmail(email)) {
           return NextResponse.json(
             { error: 'Invalid email format' },
-            { status: 400 },
+            { status: 400 }
           );
         }
         break;
       }
       case '/api/confirm/email': {
-        const { code } = body;
-        const extraFieldsResponse = checkExtraFields(['code']);
+        const { userId, token } = body;
+        const extraFieldsResponse = checkExtraFields(['userId', 'token']);
         if (extraFieldsResponse) return extraFieldsResponse;
 
-        if (!validateConfirmEmailCode(code)) {
+        if (!validateConfirmEmailCode(userId, token)) {
           return NextResponse.json(
             {
               errors: [{ msg: 'Code must be at least 5 characters long.' }],
             },
-            { status: 400 },
+            { status: 400 }
           );
         }
         break;
@@ -119,7 +139,7 @@ export async function middleware(request: NextRequest) {
         if (!validateEmail(email)) {
           return NextResponse.json(
             { error: 'Invalid email format' },
-            { status: 400 },
+            { status: 400 }
           );
         }
         break;
@@ -134,7 +154,7 @@ export async function middleware(request: NextRequest) {
             {
               errors: [{ msg: 'Token must be at least 5 characters long.' }],
             },
-            { status: 400 },
+            { status: 400 }
           );
         }
         if (!validatePassword(password)) {
@@ -142,16 +162,15 @@ export async function middleware(request: NextRequest) {
             {
               errors: [{ msg: 'Password must be at least 5 characters long.' }],
             },
-            { status: 400 },
+            { status: 400 }
           );
         }
         break;
       }
-      default:
     }
   }
 
-  return NextResponse.next();
+  return res;
 }
 
 export const config = {
@@ -161,5 +180,6 @@ export const config = {
     '/api/confirm/email',
     '/api/password/forgot',
     '/api/password/reset',
+    '/api/payments/checkout',
   ],
 };

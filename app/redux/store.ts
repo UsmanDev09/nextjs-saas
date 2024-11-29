@@ -10,14 +10,15 @@ let store: EnhancedStore;
 
 // TODO: fix internal function parameter type
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const createStore = (preloadedState?: any) => configureStore({
-  reducer: {
-    // @ts-expect-error: Ignoring type error for reducer
-    auth: authReducer,
-    notifications: NotificationsReducer,
-  },
-  preloadedState,
-});
+const createStore = (preloadedState?: any) =>
+  configureStore({
+    reducer: {
+      // @ts-expect-error: Ignoring type error for reducer
+      auth: authReducer,
+      notifications: NotificationsReducer,
+    },
+    preloadedState,
+  });
 
 export type Store = ReturnType<typeof createStore>;
 export type RootState = ReturnType<Store['getState']>;

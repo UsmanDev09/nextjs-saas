@@ -35,14 +35,17 @@ export default function EmailVerification({
         });
 
         const data = await response.json();
-
         if (response.ok) {
           toast.success('Email verified');
         } else {
-          toast.error(data.error || 'Failed to verify email');
+          toast.error(data.errors[0].msg || 'Failed to verify email');
         }
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'An error occurred while verifying your email');
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : 'An error occurred while verifying your email',
+        );
       }
     };
 

@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import prisma from '@/lib/prisma';
 import UserStatus from '../(enums)/userStatus.enum';
 import VerificationTokenType from '../(enums)/verificationTokenType.enum';
@@ -6,6 +7,12 @@ import {
   sendVerificationEmail,
 } from './mailerService';
 
+const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key';
+interface User {
+  id: string;
+  email: string;
+  role: string;
+}
 const verifyEmail = async (userId: string, code: string) => {
   try {
     const user = await prisma.user.findUnique({
@@ -53,30 +60,31 @@ const sendVerifyEmail = async (userId: string) => {
     }
 
     if (
-      user.status === UserStatus.Verified
-      || user.status === UserStatus.Active
+      user.status === UserStatus.Verified ||
+      user.status === UserStatus.Active
     ) {
       return { message: 'Email verified' };
     }
 
     const token = user.verificationTokens.find(
-      (t) => t.type === VerificationTokenType.VerifyEmail,
+      (t) => t.type === VerificationTokenType.VerifyEmail
     );
-    const canSubmit = !token || new Date().getTime() - token.submitted_at.getTime() >= 60000;
+    const canSubmit =
+      !token || new Date().getTime() - token.submitted_at.getTime() >= 60000;
 
     if (user.status === UserStatus.Pending && canSubmit) {
       const verificationToken = await prisma.usersVerificationToken.create({
         data: {
           userId: user.id,
           type: VerificationTokenType.VerifyEmail,
-          token: Math.floor(1000 + Math.random() * 9000).toString(),
+          token: jwt.sign({}, JWT_SECRET, { expiresIn: '1h' }),
         },
       });
       if (verificationToken.token) {
         await sendVerificationEmail(
           user.email,
           verificationToken.token,
-          user.username,
+          user.username
         );
       } else {
         return {
@@ -92,7 +100,7 @@ const sendVerifyEmail = async (userId: string) => {
 };
 
 const sendForgotPassword = async (
-  email: string,
+  email: string
 ): Promise<{ message: string }> => {
   try {
     const user = await prisma.user.findUnique({
@@ -120,7 +128,15 @@ const sendForgotPassword = async (
     return { message: `Failed to send reset email, ${error}` };
   }
 };
+export const createJwtTokenPair = async (user: User) => {
+  const payload = { email: user.email, sub: user.id, role: user.role };
+  const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
+  const refreshToken = jwt.sign({ sub: user.id }, JWT_SECRET, {
+    expiresIn: '7d',
+  });
 
+  return { accessToken, refreshToken };
+};
 const authorizationService = {
   verifyEmail,
   sendVerifyEmail,

@@ -24,6 +24,8 @@ model User {
   status             String                   @default("pending")
   name               String                   @default("")
   username           String                   @unique()
+  oauth_provider            String?
+  last_login                DateTime?
   userProfiles       Profile?
   usersSoftSkills    UsersToSkills[]
   verificationTokens UsersVerificationToken[] @relation("UserVerificationTokens")

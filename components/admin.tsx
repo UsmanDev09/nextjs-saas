@@ -1,14 +1,19 @@
+/* eslint-disable react/button-has-type */
+
 'use client';
 
 import { useState } from 'react';
-import {
-  ArrowRightOnRectangleIcon,
-} from '@heroicons/react/24/outline';
+import { ArrowRightStartOnRectangleIcon } from '@heroicons/react/24/solid';
 import NotificationsComponent from '@/app/notifications-page/page';
 import FriendsComponent from '@/app/friends-page/page';
+import { LogoutModal } from '@/components/logoutModal';
 
-export default function Admin({ loggedInUser } : { loggedInUser: string }) {
+interface loggedUser{
+  loggedInUser:string
+}
+export default function Admin({ loggedInUser }: loggedUser) {
   const [activeTab, setActiveTab] = useState('Week');
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -19,7 +24,9 @@ export default function Admin({ loggedInUser } : { loggedInUser: string }) {
         </div>
         <NotificationsComponent />
         <div className="flex-grow" />
-        <ArrowRightOnRectangleIcon className="w-6 h-6 text-gray-500 cursor-pointer" />
+        <button onClick={() => setShowLogoutModal(true)}>
+          <ArrowRightStartOnRectangleIcon className="w-6 h-6 text-gray-500 cursor-pointer" />
+        </button>
       </div>
 
       {/* Main Content */}
@@ -70,7 +77,7 @@ export default function Admin({ loggedInUser } : { loggedInUser: string }) {
             <div className="bg-white rounded-lg p-6 shadow">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Achievements 1/40</h3>
-                <button type="button" className="text-sm text-purple-500 font-medium">
+                <button className="text-sm text-purple-500 font-medium">
                   SEE ALL
                 </button>
               </div>
@@ -123,8 +130,8 @@ export default function Admin({ loggedInUser } : { loggedInUser: string }) {
                 <h3 className="text-lg font-semibold">Skill Progress</h3>
                 <div className="flex space-x-2">
                   {['Week', 'Month'].map((tab) => (
+                    // eslint-disable-next-line react/button-has-type
                     <button
-                      type="button"
                       key={tab}
                       onClick={() => setActiveTab(tab)}
                       className={`px-4 py-1 rounded-full text-sm font-medium ${
@@ -179,6 +186,11 @@ export default function Admin({ loggedInUser } : { loggedInUser: string }) {
           </div>
         </div>
       </div>
+
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+      />
     </div>
   );
 }

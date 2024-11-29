@@ -45,7 +45,9 @@ export default function UserProfile() {
         setUser(data.user);
         setIsLoading(false);
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Failed to load user profile');
+        setError(
+          err instanceof Error ? err.message : 'Failed to load user profile'
+        );
         setIsLoading(false);
       }
     };
@@ -125,7 +127,6 @@ export default function UserProfile() {
                 onChange={handleInputChange}
               />
             </label>
-
           </div>
           <div className="mb-4">
             <label
@@ -142,7 +143,6 @@ export default function UserProfile() {
                 onChange={handleInputChange}
               />
             </label>
-
           </div>
           <div className="mb-4">
             <label
@@ -175,7 +175,6 @@ export default function UserProfile() {
                 onChange={handleInputChange}
               />
             </label>
-
           </div>
           <div className="mb-6">
             <label
@@ -192,7 +191,6 @@ export default function UserProfile() {
                 onChange={handleInputChange}
               />
             </label>
-
           </div>
           <div className="flex items-center justify-between">
             <button
@@ -213,29 +211,19 @@ export default function UserProfile() {
       ) : (
         <div>
           <p className="mb-2">
-            <strong>Name:</strong>
-            {' '}
-            {user?.name}
+            <strong>Name:</strong> {user?.name}
           </p>
           <p className="mb-2">
-            <strong>Username:</strong>
-            {' '}
-            {user?.username}
+            <strong>Username:</strong> {user?.username}
           </p>
           <p className="mb-2">
-            <strong>Age:</strong>
-            {' '}
-            {profile?.age}
+            <strong>Age:</strong> {profile?.age}
           </p>
           <p className="mb-2">
-            <strong>Gender:</strong>
-            {' '}
-            {profile?.gender}
+            <strong>Gender:</strong> {profile?.gender}
           </p>
           <p className="mb-2">
-            <strong>Phone Number:</strong>
-            {' '}
-            {profile?.phoneNumber}
+            <strong>Phone Number:</strong> {profile?.phoneNumber}
           </p>
           <button
             type="button"

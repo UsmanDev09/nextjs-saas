@@ -5,15 +5,15 @@ import { handleThunkApiError } from '../../utils';
 
 export const createNotification = createAsyncThunk(
   'notifications/createNotification',
-  handleThunkApiError(notificationService.createNotification),
+  handleThunkApiError(notificationService.createNotification)
 );
 
 export const getNotifications = createAsyncThunk(
   'getNotifications',
-  handleThunkApiError(notificationService.getNotificationsList),
+  handleThunkApiError(notificationService.getNotificationsList)
 );
 
 export const readAllNotifications = createAsyncThunk(
   'readNotifications',
-  handleThunkApiError(notificationService.readAllNotifications),
+  handleThunkApiError(notificationService.readAllNotifications)
 );

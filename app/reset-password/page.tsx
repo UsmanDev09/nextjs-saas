@@ -29,7 +29,7 @@ export default function ResetPassword() {
       if (response.ok) {
         setStatus('success');
         setMessage(
-          'If an account exists for that email, we have sent password reset instructions.',
+          'If an account exists for that email, we have sent password reset instructions.'
         );
       } else {
         setStatus('error');
