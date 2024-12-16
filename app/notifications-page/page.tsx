@@ -41,7 +41,7 @@ export default function NotificationsComponent() {
         const accessToken = Cookies.get('accessToken');
 
         if (!accessToken) {
-          toast.error('No access token found!');
+          // toast.error('No access token found!');
           return;
         }
 

@@ -1,9 +1,12 @@
 import type { NextAuthOptions } from 'next-auth';
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { toast } from 'react-toastify';
+import GoogleProvider from 'next-auth/providers/google';
 
+console.log('RRR');
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: {
@@ -12,7 +15,12 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/sign-in',
   },
+  adapter: PrismaAdapter(prisma),
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
@@ -25,6 +33,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
+          console.log('REACHED HERE');
           const user = await prisma.user.findUnique({
             where: { email: credentials.email },
           });
@@ -59,7 +68,9 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
+      console.log('token', token, user, account);
+
       if (user) {
         return {
           ...token,
@@ -72,6 +83,7 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
+      console.log('SESSION');
       return {
         ...session,
         user: {

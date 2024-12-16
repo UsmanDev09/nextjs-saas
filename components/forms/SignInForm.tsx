@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
@@ -13,7 +13,7 @@ import {
   LockClosedIcon,
 } from '@heroicons/react/24/outline';
 import { toast } from 'react-toastify';
-import { signIn } from 'next-auth/react';
+import { getProviders, signIn } from 'next-auth/react';
 
 const validationSchema = Yup.object({
   email: Yup.string().email('Invalid email address').required('Required'),
@@ -22,9 +22,20 @@ const validationSchema = Yup.object({
     .required('Required'),
 });
 
-export default function SignInPage() {
+export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
+  const [providers, setProviders] = useState();
   const router = useRouter();
+
+  async function initProviders() {
+    const p = await getProviders();
+    console.log('p', p);
+    setProviders(p);
+  }
+
+  useEffect(() => {
+    initProviders();
+  }, []);
 
   const formik = useFormik({
     initialValues: {
@@ -41,6 +52,8 @@ export default function SignInPage() {
           password,
           redirect: false,
         });
+
+        console.log('res', response);
 
         if (response?.ok) {
           toast.success('Signin successfull');
@@ -121,12 +134,21 @@ export default function SignInPage() {
               </div>
             )}
           </div>
-          <button
+          {/* <button
             type="submit"
             className="w-full bg-purple-500 text-white py-3 rounded-xl font-semibold hover:bg-purple-600 transition duration-300"
           >
             Sign in
-          </button>
+          </button> */}
+          {providers && Object.values(providers).map((provider) => (
+            <div key={provider.name}>
+              <button type="button" onClick={() => signIn(provider.id)}>
+                Sign in with
+                {' '}
+                {provider.name}
+              </button>
+            </div>
+          ))}
         </form>
         <p className="text-center text-sm text-gray-500 mt-4">
           By signing in, I agree to the
@@ -150,6 +172,7 @@ export default function SignInPage() {
             Sign up
           </Link>
         </p>
+
       </div>
     </div>
   );

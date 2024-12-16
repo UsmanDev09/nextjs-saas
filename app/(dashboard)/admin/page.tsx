@@ -1,10 +1,11 @@
-import Admin from '@/components/admin';
-import { cookies } from 'next/headers';
+'use client';
 
-async function AdminPage() {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get('accessToken');
-  if (!accessToken) {
+import Admin from '@/components/admin';
+import { useSession } from 'next-auth/react';
+
+function AdminPage() {
+  const session = useSession();
+  if (!session) {
     return (
       <div className="text-center p-4">
         <h1 className="text-2xl font-bold">
@@ -14,19 +15,7 @@ async function AdminPage() {
     );
   }
 
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/logged-in-user`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken?.value}`,
-      },
-    },
-  );
-
-  const data = await response.json();
-  const loggedInUser = data?.user?.name || '';
-
-  return <Admin loggedInUser={loggedInUser} />;
+  return <Admin loggedInUser={session?.user} />;
 }
 
 export default AdminPage;

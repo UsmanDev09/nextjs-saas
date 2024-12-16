@@ -44,6 +44,7 @@ export async function middleware(request: NextRequest) {
       }
       return null;
     };
+
     switch (pathname) {
       case '/api/sign-up': {
         const { email, password, confirmPassword } = body;

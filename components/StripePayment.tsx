@@ -39,6 +39,7 @@ function StripePayment() {
             ],
           }),
         },
+
       );
 
       if (!response.ok) {

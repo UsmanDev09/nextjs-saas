@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
@@ -12,9 +12,10 @@ import {
   LockClosedIcon,
 } from '@heroicons/react/24/outline';
 import { toast } from 'react-toastify';
-import LinkedInSvg from '../svgs/linkedInSvg';
-import GoogleSvg from '../svgs/googleSvg';
-import FacebookSvg from '../svgs/facebookSvg';
+import { getProviders, signIn } from 'next-auth/react';
+// import LinkedInSvg from '../svgs/linkedInSvg';
+// import GoogleSvg from '../svgs/googleSvg';
+// import FacebookSvg from '../svgs/facebookSvg';
 
 const validationSchema = Yup.object({
   email: Yup.string().email('Invalid email address').required('Required'),
@@ -29,6 +30,16 @@ const validationSchema = Yup.object({
 export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [providers, setProviders] = useState();
+
+  async function initProviders() {
+    const p = await getProviders();
+    setProviders(p);
+  }
+
+  useEffect(() => {
+    initProviders();
+  }, []);
 
   const formik = useFormik({
     initialValues: {
@@ -175,17 +186,26 @@ export default function SignUpPage() {
             Terms and Conditions
           </Link>
         </p>
-        <div className="flex justify-center space-x-4 mt-6">
-          <button type="button" className="w-12 h-12 flex items-center justify-center rounded-xl border border-gray-300 hover:bg-gray-50 transition duration-300">
+        {/* <div className="flex justify-center space-x-4 mt-6">
+          <button type="button"
+          className="w-12 h-12
+          flex items-center justify-center rounded-xl border border-gray-300
+          hover:bg-gray-50 transition duration-300">
             <LinkedInSvg />
           </button>
-          <button type="button" className="w-12 h-12 flex items-center justify-center rounded-xl border border-gray-300 hover:bg-gray-50 transition duration-300">
+          <button type="button"
+          className="w-12 h-12 flex
+          items-center justify-center
+          rounded-xl border border-gray-300 hover:bg-gray-50 transition duration-300">
             <GoogleSvg />
           </button>
-          <button type="button" className="w-12 h-12 flex items-center justify-center rounded-xl border border-gray-300 hover:bg-gray-50 transition duration-300">
+          <button type="button"
+          className="w-12 h-12 flex
+          items-center justify-center
+          rounded-xl border border-gray-300 hover:bg-gray-50 transition duration-300">
             <FacebookSvg />
           </button>
-        </div>
+        </div> */}
         <p className="text-center text-sm text-gray-500 mt-6">
           Have an account?
           <Link
@@ -196,6 +216,15 @@ export default function SignUpPage() {
           </Link>
         </p>
       </div>
+      {providers && Object.values(providers).map((provider) => (
+        <div key={provider.name}>
+          <button type="button" onClick={() => signIn(provider.id)}>
+            Sign in with
+            {' '}
+            {provider.name}
+          </button>
+        </div>
+      ))}
     </div>
   );
 }

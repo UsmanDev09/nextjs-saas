@@ -14,19 +14,61 @@ datasource db {
 }
 
 model User {
-  id                 String                   @id @default(uuid()) @db.Uuid
-  email              String                   @unique()
-  password           String?                  @db.VarChar
-  emailVerified      DateTime?
-  createdAt          DateTime                 @default(now())
-  updatedAt          DateTime                 @updatedAt
-  role               String                   @default("user")
-  status             String                   @default("pending")
-  name               String                   @default("")
-  username           String                   @unique()
-  userProfiles       Profile?
-  usersSoftSkills    UsersToSkills[]
-  verificationTokens UsersVerificationToken[] @relation("UserVerificationTokens")
+  id       String  @id @default(uuid()) @db.Uuid
+  email    String  @unique()
+  password String? @db.VarChar
+  image    String?
+
+  emailVerified   DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  role            String          @default("user")
+  status          String          @default("pending")
+  name            String          @default("")
+  username        String?         @unique()
+  accounts        Account[]
+  sessions        Session[]
+  userProfiles    Profile?
+  usersSoftSkills UsersToSkills[]
+}
+
+model Account {
+  userId            String  @unique() @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String   @db.Uuid
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
 }
 
 model Profile {
@@ -41,10 +83,6 @@ model Profile {
   createdAt   DateTime?                        @default(now())
   updatedAt   DateTime?                        @updatedAt
   users       User                             @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  notificationsFrom Notification[] @relation("FromUser")
-  notificationsTo   Notification[] @relation("ToUser")
-  Notification      Notification[]
 }
 
 model UsersToSkills {
@@ -63,53 +101,6 @@ model SoftSkill {
   id              String          @id @default(uuid()) @db.Uuid
   name            String          @unique()
   usersSoftSkills UsersToSkills[]
-}
-
-model Notification {
-  id                          String    @id @default(uuid()) @db.Uuid
-  userId                      String?   @db.Uuid
-  fromUserId                  String?   @db.Uuid
-  notificationMessage         String?
-  notificationLink            String?
-  userAction                  String    @default("unread")
-  expiryDate                  DateTime?
-  status                      Boolean?  @default(true)
-  createdAt                   DateTime  @default(now())
-  updatedAt                   DateTime  @updatedAt
-  userRequestAction           String    @default("no-action")
-  systemNotificationReadedBy  String?
-  systemNotificationDeletedBy String?
-  notificationTypeId          String?   @db.Uuid
-  groupId                     String?   @db.Uuid
-
-  notificationType NotificationType? @relation("TypeOfNotification", fields: [notificationTypeId], references: [id])
-  fromUser         Profile?          @relation("FromUser", fields: [fromUserId], references: [id])
-  toUser           Profile?          @relation("ToUser", fields: [userId], references: [id])
-  Profile          Profile?          @relation(fields: [profileId], references: [id])
-  profileId        String?           @db.Uuid
-}
-
-model NotificationType {
-  id                String         @id @default(uuid()) @db.Uuid
-  notificationName  String         @unique
-  isSystemGenerated Boolean?       @default(false)
-  status            Boolean?       @default(true)
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @default(now()) @updatedAt
-  notifications     Notification[] @relation("TypeOfNotification")
-}
-
-model UsersVerificationToken {
-  id           String    @id @default(uuid()) @db.Uuid
-  type         String
-  submitted_at DateTime  @default(now())
-  token        String?
-  expire_at    DateTime? @default(now())
-  userId       String    @db.Uuid
-  user         User      @relation("UserVerificationTokens", fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, type])
-  @@map("users_verification_tokens")
 }
 
 enum user_profiles_gender_enum {

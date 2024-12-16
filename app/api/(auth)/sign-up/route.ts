@@ -8,6 +8,8 @@ export async function POST(req: NextRequest) {
   try {
     const { email, password } = await req.json();
 
+    console.log('reached here');
+
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email and password are required' },

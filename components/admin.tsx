@@ -6,10 +6,16 @@ import {
 } from '@heroicons/react/24/outline';
 import NotificationsComponent from '@/app/notifications-page/page';
 import FriendsComponent from '@/app/friends-page/page';
+import { signOut, useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function Admin({ loggedInUser } : { loggedInUser: string }) {
   const [activeTab, setActiveTab] = useState('Week');
 
+  const session = useSession();
+  const router = useRouter();
+
+  if (!session) router.push('/');
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Left Sidebar */}
@@ -19,7 +25,7 @@ export default function Admin({ loggedInUser } : { loggedInUser: string }) {
         </div>
         <NotificationsComponent />
         <div className="flex-grow" />
-        <ArrowRightOnRectangleIcon className="w-6 h-6 text-gray-500 cursor-pointer" />
+        <ArrowRightOnRectangleIcon onClick={() => signOut({ callbackUrl: 'http://localhost:3000' })} className="w-6 h-6 text-gray-500 cursor-pointer" />
       </div>
 
       {/* Main Content */}
