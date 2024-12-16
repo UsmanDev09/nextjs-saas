@@ -53,16 +53,17 @@ const sendVerifyEmail = async (userId: string) => {
     }
 
     if (
-      user.status === UserStatus.Verified
-      || user.status === UserStatus.Active
+      user.status === UserStatus.Verified ||
+      user.status === UserStatus.Active
     ) {
       return { message: 'Email verified' };
     }
 
     const token = user.verificationTokens.find(
-      (t) => t.type === VerificationTokenType.VerifyEmail,
+      (t) => t.type === VerificationTokenType.VerifyEmail
     );
-    const canSubmit = !token || new Date().getTime() - token.submitted_at.getTime() >= 60000;
+    const canSubmit =
+      !token || new Date().getTime() - token.submitted_at.getTime() >= 60000;
 
     if (user.status === UserStatus.Pending && canSubmit) {
       const verificationToken = await prisma.usersVerificationToken.create({
@@ -76,7 +77,7 @@ const sendVerifyEmail = async (userId: string) => {
         await sendVerificationEmail(
           user.email,
           verificationToken.token,
-          user.username,
+          user.username
         );
       } else {
         return {
@@ -92,7 +93,7 @@ const sendVerifyEmail = async (userId: string) => {
 };
 
 const sendForgotPassword = async (
-  email: string,
+  email: string
 ): Promise<{ message: string }> => {
   try {
     const user = await prisma.user.findUnique({

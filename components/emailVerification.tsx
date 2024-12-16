@@ -13,7 +13,7 @@ export default function EmailVerification({
   token,
 }: EmailVerificationClientProps) {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
-    'loading',
+    'loading'
   );
   const [message, setMessage] = useState('');
 
@@ -42,7 +42,11 @@ export default function EmailVerification({
           toast.error(data.error || 'Failed to verify email');
         }
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'An error occurred while verifying your email');
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : 'An error occurred while verifying your email'
+        );
       }
     };
 

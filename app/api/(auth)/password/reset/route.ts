@@ -13,7 +13,7 @@ async function handlePasswordReset(req: AuthenticatedRequest) {
     if (!req.user || !req.user.sub) {
       return NextResponse.json(
         { error: 'User not authenticated' },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -33,19 +33,19 @@ async function handlePasswordReset(req: AuthenticatedRequest) {
 
     return NextResponse.json(
       { response: 'User password changed successfully' },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     if (error instanceof Error) {
       return NextResponse.json(
         { error: `Failed to reset password: ${error.message}` },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
     return NextResponse.json(
       { error: 'Failed to reset password' },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

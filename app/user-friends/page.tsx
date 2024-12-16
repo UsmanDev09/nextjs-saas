@@ -28,11 +28,10 @@ export default function Friends() {
       <h1>Welcome, User</h1>
       <h2>Your Friends:</h2>
       <ul>
-        {friends.length > 0
-          && friends.map((friend: {
-            id: string,
-            name: string
-          }) => <li key={friend.id}>{friend.name}</li>)}
+        {friends.length > 0 &&
+          friends.map((friend: { id: string; name: string }) => (
+            <li key={friend.id}>{friend.name}</li>
+          ))}
       </ul>
     </div>
   );

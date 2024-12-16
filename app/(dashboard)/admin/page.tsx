@@ -4,8 +4,8 @@ import Admin from '@/components/admin';
 import { useSession } from 'next-auth/react';
 
 function AdminPage() {
-  const session = useSession();
-  if (!session) {
+  const { data: session, status } = useSession();
+  if (status === 'unauthenticated') {
     return (
       <div className="text-center p-4">
         <h1 className="text-2xl font-bold">
@@ -14,8 +14,7 @@ function AdminPage() {
       </div>
     );
   }
-
-  return <Admin loggedInUser={session?.user} />;
+  return <Admin loggedInUser={session?.user.name as string} />;
 }
 
 export default AdminPage;

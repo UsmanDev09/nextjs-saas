@@ -6,5 +6,5 @@ export const authorizationsStateSelector = ({ auth }: RootState) => auth;
 
 export const profile = createSelector(
   authorizationsStateSelector,
-  (state) => state.profile,
+  (state) => state.profile
 );

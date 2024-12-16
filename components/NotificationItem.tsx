@@ -1,16 +1,20 @@
 import { PuzzlePieceIcon, UserIcon } from '@heroicons/react/24/outline';
 
 interface Notification {
-    id: string;
-    notificationMessage: string;
-    createdAt: string;
-    notificationType: {
-      notificationName: string;
-    };
-    userRequestAction: string;
+  id: string;
+  notificationMessage: string;
+  createdAt: string;
+  notificationType: {
+    notificationName: string;
+  };
+  userRequestAction: string;
 }
 
-export default function NotificationItem({ notification }: { notification: Notification }) {
+export default function NotificationItem({
+  notification,
+}: {
+  notification: Notification;
+}) {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date

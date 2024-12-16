@@ -6,7 +6,9 @@ interface IHandleThunkApiErrorOptions {
   showToast?: boolean;
 }
 
-type ThunkApi<Action, Response> = Parameters<AsyncThunkPayloadCreator<Response, Action>>[1];
+type ThunkApi<Action, Response> = Parameters<
+  AsyncThunkPayloadCreator<Response, Action>
+>[1];
 const handleShowToast = (e: unknown, options?: IHandleThunkApiErrorOptions) => {
   if (!options?.showToast) {
     return;
@@ -22,10 +24,15 @@ const handleShowToast = (e: unknown, options?: IHandleThunkApiErrorOptions) => {
   }
 };
 
-export const handleThunkApiError = <Action, Response>(
-  service: (action: Action, thunkAPI?: ThunkApi<Response, Action>) => Promise<Response>,
-  options?: IHandleThunkApiErrorOptions,
-) => async (action: Action, thunkAPI: ThunkApi<Response, Action>) => {
+export const handleThunkApiError =
+  <Action, Response>(
+    service: (
+      action: Action,
+      thunkAPI?: ThunkApi<Response, Action>
+    ) => Promise<Response>,
+    options?: IHandleThunkApiErrorOptions
+  ) =>
+  async (action: Action, thunkAPI: ThunkApi<Response, Action>) => {
     try {
       return await service(action, thunkAPI);
     } catch (e) {
