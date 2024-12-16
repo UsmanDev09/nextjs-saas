@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String  @id @default(uuid()) @db.Uuid
+  email    String  @unique()
+  password String? @db.VarChar
+  image    String?
+
+  emailVerified   DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  role            String          @default("user")
+  status          String          @default("pending")
+  name            String          @default("")
+  username        String?         @unique()
+  accounts        Account[]
+  sessions        Session[]
+  userProfiles    Profile?
+  usersSoftSkills UsersToSkills[]
+}
+
+model Account {
+  userId            String  @unique() @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String   @db.Uuid
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+model Profile {
+  id          String                           @id @default(uuid()) @db.Uuid
+  age         Int?
+  gender      user_profiles_gender_enum?
+  profileType user_profiles_profile_type_enum?
+  userId      String                           @unique() @db.Uuid
+  phoneNumber String?
+  deleted     Int                              @default(0)
+  status      Int                              @default(1)
+  createdAt   DateTime?                        @default(now())
+  updatedAt   DateTime?                        @updatedAt
+  users       User                             @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model UsersToSkills {
+  id          String    @default(uuid()) @db.Uuid
+  userId      String    @default(uuid()) @db.Uuid
+  softSkillId String    @default(uuid()) @db.Uuid
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+  softSkills  SoftSkill @relation(fields: [softSkillId], references: [id], onDelete: Cascade)
+  users       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, softSkillId])
+}
+
+model SoftSkill {
+  id              String          @id @default(uuid()) @db.Uuid
+  name            String          @unique()
+  usersSoftSkills UsersToSkills[]
+}
+
+enum user_profiles_gender_enum {
+  male
+  female
+  other
+}
+
+enum user_profiles_profile_type_enum {
+  student
+  professional
+}

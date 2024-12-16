@@ -1,0 +1,7 @@
+<svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M12.166 23.5C18.5173 23.5 23.666 18.3513 23.666 12C23.666 5.64873 18.5173 0.5 12.166 0.5C5.81474 0.5 0.666016 5.64873 0.666016 12C0.666016 18.3513 5.81474 23.5 12.166 23.5Z" 
+    fill="#FEC943" stroke="#CDAA24" stroke-width="2"/>
+  <text x="50%" y="55%" text-anchor="middle" font-size="8" font-weight="bold" fill="white" dy=".3em">
+    $
+  </text>
+</svg>
