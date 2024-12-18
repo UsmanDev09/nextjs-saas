@@ -1,8 +1,8 @@
-import jwt from 'jsonwebtoken';
+// import jwt from 'jsonwebtoken';
 import { NextResponse, NextRequest } from 'next/server';
 import authorizationService from '@/app/services/authServices';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key';
+import prisma from '@/lib/prisma';
+// const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key';
 export async function POST(req: NextRequest) {
   try {
     const { userId, token } = await req.json();
@@ -13,11 +13,20 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
-
-    const decoded = jwt.verify(token, JWT_SECRET);
-    if (!decoded) {
+    const Verifytoken = await prisma.verificationToken.findUnique({
+      where: {
+        identifier_token: {
+          identifier: userId,
+          token,
+        },
+      },
+    });
+    if (Verifytoken && token !== Verifytoken.token) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 400 });
     }
+    // const decoded = jwt.verify(token, JWT_SECRET);
+    // if (!decoded) {
+    // }
     await authorizationService.verifyEmail(userId, token);
 
     return NextResponse.json(

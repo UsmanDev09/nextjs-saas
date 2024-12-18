@@ -16,13 +16,13 @@ export async function POST(req: NextRequest) {
     if (error instanceof Error) {
       return NextResponse.json(
         { error: `Failed to send email: ${error.message}` },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
     return NextResponse.json(
       { error: 'Failed to send email' },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

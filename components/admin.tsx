@@ -1,17 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  ArrowRightOnRectangleIcon,
-} from '@heroicons/react/24/outline';
+import { ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
 import NotificationsComponent from '@/app/notifications-page/page';
 import FriendsComponent from '@/app/friends-page/page';
-import { signOut, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { LogoutModal } from './logoutModal';
 
-export default function Admin({ loggedInUser } : { loggedInUser: string }) {
+export default function Admin({ loggedInUser }: { loggedInUser: string }) {
   const [activeTab, setActiveTab] = useState('Week');
-
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const session = useSession();
   const router = useRouter();
 
@@ -25,7 +24,10 @@ export default function Admin({ loggedInUser } : { loggedInUser: string }) {
         </div>
         <NotificationsComponent />
         <div className="flex-grow" />
-        <ArrowRightOnRectangleIcon onClick={() => signOut({ callbackUrl: 'http://localhost:3000' })} className="w-6 h-6 text-gray-500 cursor-pointer" />
+        <ArrowRightOnRectangleIcon
+          className="w-6 h-6 text-gray-500 cursor-pointer"
+          onClick={() => setShowLogoutModal(true)}
+        />
       </div>
 
       {/* Main Content */}
@@ -76,7 +78,10 @@ export default function Admin({ loggedInUser } : { loggedInUser: string }) {
             <div className="bg-white rounded-lg p-6 shadow">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Achievements 1/40</h3>
-                <button type="button" className="text-sm text-purple-500 font-medium">
+                <button
+                  type="button"
+                  className="text-sm text-purple-500 font-medium"
+                >
                   SEE ALL
                 </button>
               </div>
@@ -185,6 +190,10 @@ export default function Admin({ loggedInUser } : { loggedInUser: string }) {
           </div>
         </div>
       </div>
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+      />
     </div>
   );
 }

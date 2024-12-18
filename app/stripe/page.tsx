@@ -13,13 +13,22 @@ interface Product {
 export default function CheckoutPage() {
   const [products, setProducts] = useState<Product[]>([
     {
-      id: '1', name: 'Product 1', price: 10.99, quantity: 1,
+      id: '1',
+      name: 'Product 1',
+      price: 10.99,
+      quantity: 1,
     },
     {
-      id: '2', name: 'Product 2', price: 15.99, quantity: 1,
+      id: '2',
+      name: 'Product 2',
+      price: 15.99,
+      quantity: 1,
     },
     {
-      id: '3', name: 'Product 3', price: 7.99, quantity: 1,
+      id: '3',
+      name: 'Product 3',
+      price: 7.99,
+      quantity: 1,
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,9 +37,11 @@ export default function CheckoutPage() {
 
   const handleQuantityChange = (id: string, newQuantity: number) => {
     setProducts(
-      products.map((product) => (product.id === id
-        ? { ...product, quantity: Math.max(0, newQuantity) }
-        : product)),
+      products.map((product) =>
+        product.id === id
+          ? { ...product, quantity: Math.max(0, newQuantity) }
+          : product
+      )
     );
   };
 
@@ -56,7 +67,11 @@ export default function CheckoutPage() {
       const { url } = await response.json();
       router.push(url);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred. Please try again.');
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'An error occurred. Please try again.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -64,7 +79,7 @@ export default function CheckoutPage() {
 
   const totalAmount = products.reduce(
     (sum, product) => sum + product.price * product.quantity,
-    0,
+    0
   );
 
   return (
@@ -77,16 +92,15 @@ export default function CheckoutPage() {
         >
           <div>
             <h2 className="text-lg font-semibold">{product.name}</h2>
-            <p className="text-gray-600">
-              $
-              {product.price.toFixed(2)}
-            </p>
+            <p className="text-gray-600">${product.price.toFixed(2)}</p>
           </div>
           <div className="flex items-center">
             <button
               type="button"
               className="px-2 py-1 bg-gray-200 rounded"
-              onClick={() => handleQuantityChange(product.id, product.quantity - 1)}
+              onClick={() =>
+                handleQuantityChange(product.id, product.quantity - 1)
+              }
             >
               -
             </button>
@@ -94,7 +108,9 @@ export default function CheckoutPage() {
             <button
               type="button"
               className="px-2 py-1 bg-gray-200 rounded"
-              onClick={() => handleQuantityChange(product.id, product.quantity + 1)}
+              onClick={() =>
+                handleQuantityChange(product.id, product.quantity + 1)
+              }
             >
               +
             </button>
@@ -103,8 +119,7 @@ export default function CheckoutPage() {
       ))}
 
       <div className="mt-6 text-xl font-bold">
-        Total: $
-        {totalAmount.toFixed(2)}
+        Total: ${totalAmount.toFixed(2)}
       </div>
 
       {error && <div className="mt-4 text-red-500">{error}</div>}

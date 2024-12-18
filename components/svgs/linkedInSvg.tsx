@@ -1,8 +1,27 @@
+import { signIn } from 'next-auth/react';
 import React from 'react';
+import { toast } from 'react-toastify';
 
 function LinkedInSvg() {
+  const loginWithLinkedIn = async () => {
+    try {
+      await signIn('linkedin', { callbackUrl: '/admin' });
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'An unexpected error occurred. Please try again.'
+      );
+    }
+  };
   return (
-    <div>
+    <div
+      role="button"
+      tabIndex={0}
+      aria-label="Svg"
+      onKeyDown={() => console.log('pressed')}
+      onClick={loginWithLinkedIn}
+    >
       <svg
         className="w-6 h-6"
         viewBox="0 0 24 24"

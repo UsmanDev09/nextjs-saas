@@ -6,7 +6,7 @@ function validateEmail(email: string) {
 }
 
 function validateConfirmEmailCode(code: string) {
-  return code && code.length >= 5;
+  return code && code.length >= 4;
 }
 
 function validateToken(token: string) {
@@ -98,11 +98,11 @@ export async function middleware(request: NextRequest) {
         break;
       }
       case '/api/confirm/email': {
-        const { code } = body;
-        const extraFieldsResponse = checkExtraFields(['code']);
+        const { userId, token } = body;
+        const extraFieldsResponse = checkExtraFields(['userId', 'token']);
         if (extraFieldsResponse) return extraFieldsResponse;
 
-        if (!validateConfirmEmailCode(code)) {
+        if (!validateConfirmEmailCode(token)) {
           return NextResponse.json(
             {
               errors: [{ msg: 'Code must be at least 5 characters long.' }],

@@ -22,14 +22,14 @@ async function profileOnboarding(req: AuthenticatedRequest) {
     if (!user.emailVerified) {
       return NextResponse.json(
         { error: 'Please verify your email before continuing with onboarding' },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
     if (user.status === UserStatus.Active) {
       return NextResponse.json(
         { error: 'Onboarding has already been completed' },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
@@ -90,15 +90,12 @@ async function profileOnboarding(req: AuthenticatedRequest) {
     return NextResponse.json([]);
   } catch (error) {
     if (error instanceof Error) {
-      return NextResponse.json(
-        { error: `${error.message}` },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: `${error.message}` }, { status: 500 });
     }
 
     return NextResponse.json(
       { error: 'Failed to complete onboarding' },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

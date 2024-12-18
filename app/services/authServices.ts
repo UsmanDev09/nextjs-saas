@@ -1,31 +1,42 @@
 import prisma from '@/lib/prisma';
 import UserStatus from '../(enums)/userStatus.enum';
-import VerificationTokenType from '../(enums)/verificationTokenType.enum';
+// import VerificationTokenType from '../(enums)/verificationTokenType.enum';
 import {
   sendForgotPasswordEmail,
   sendVerificationEmail,
 } from './mailerService';
 
-const verifyEmail = async (userId: string, code: string) => {
+const verifyEmail = async (userId: string, token: string) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      include: {
-        verificationTokens: {
-          where: {
-            token: code,
-            type: VerificationTokenType.VerifyEmail,
-          },
-        },
-      },
+      // include: {
+      //   verificationTokens: {
+      //     where: {
+      //       token: code,
+      //       type: VerificationTokenType.VerifyEmail,
+      //     },
+      //   },
+      // },
     });
 
     if (!user) {
       throw new Error('User not found');
     }
+    const Verifytoken = await prisma.verificationToken.findUnique({
+      where: {
+        identifier_token: {
+          identifier: userId,
+          token,
+        },
+      },
+    });
 
-    if (user.verificationTokens.length === 0) {
-      throw new Error('Invalid token');
+    // if (user.verificationTokens.length === 0) {
+    //   throw new Error('Invalid token');
+    // }
+    if (Verifytoken && Verifytoken.token.length === 0) {
+      throw new Error('Invalid Token');
     }
     await prisma.user.update({
       where: { id: userId },
@@ -45,9 +56,8 @@ const sendVerifyEmail = async (userId: string) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      include: { verificationTokens: true },
+      // include: { verificationTokens: true },
     });
-
     if (!user) {
       throw new Error('User not found');
     }
@@ -59,17 +69,17 @@ const sendVerifyEmail = async (userId: string) => {
       return { message: 'Email verified' };
     }
 
-    const token = user.verificationTokens.find(
-      (t) => t.type === VerificationTokenType.VerifyEmail,
-    );
-    const canSubmit = !token || new Date().getTime() - token.submitted_at.getTime() >= 60000;
-
-    if (user.status === UserStatus.Pending && canSubmit) {
-      const verificationToken = await prisma.usersVerificationToken.create({
+    // const token = user.verificationTokens.find(
+    //   (t) => t.type === VerificationTokenType.VerifyEmail
+    // );
+    // const canSubmit =
+    //   !token || new Date().getTime() - token.submitted_at.getTime() >= 60000;
+    if (user.status === UserStatus.Pending) {
+      const verificationToken = await prisma.verificationToken.create({
         data: {
-          userId: user.id,
-          type: VerificationTokenType.VerifyEmail,
+          identifier: user.id,
           token: Math.floor(1000 + Math.random() * 9000).toString(),
+          expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         },
       });
       if (verificationToken.token) {
@@ -104,11 +114,11 @@ const sendForgotPassword = async (
     }
     const token = Math.floor(1000 + Math.random() * 9000).toString();
 
-    await prisma.usersVerificationToken.create({
+    await prisma.verificationToken.create({
       data: {
-        userId: user.id,
+        identifier: user.id,
         token,
-        type: VerificationTokenType.PasswordReset,
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       },
     });
 

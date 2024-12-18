@@ -6,7 +6,7 @@ import { ReactNode } from 'react';
 interface ProviderProps {
   children: ReactNode;
 }
-function Provider({ children } : ProviderProps) {
+function Provider({ children }: ProviderProps) {
   return <SessionProvider>{children}</SessionProvider>;
 }
 

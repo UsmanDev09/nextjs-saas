@@ -55,6 +55,7 @@ const config: Config = {
         },
         grey: {
           50: '#f2f2f2',
+          80: '#F0EDF5',
           100: '#eaeaeb',
           200: '#D6D6D6',
           300: '#A09BA8',
@@ -106,9 +107,17 @@ const config: Config = {
           default: '#E6E1EE',
         },
         divider: '#E5E8EC',
+        whiteTransparent40: 'rgba(255, 255, 255, 0.4)',
       },
       fontFamily: {
-        poppins: ['Poppins', 'sans-serif'],
+        poppins: [
+          'Poppins',
+          'sans-serif',
+          'Segoe UI',
+          'Roboto',
+          'Helvetica Neue',
+          'Arial',
+        ],
       },
       borderRadius: {
         8: '8px',
@@ -120,6 +129,86 @@ const config: Config = {
       boxShadow: {
         '2px-purple': '0px 0px 0px 2px #8674DB1A',
         '24px-light': '0px 24px 64px 0px #C8C3D066',
+      },
+      h1: {
+        fontSize: 'clamp(2.625rem, 1.2857rem + 3.5714vw, 4rem)',
+        fontWeight: 800,
+        lineHeight: 1.1142857142857143,
+        color: '#0A1929',
+      },
+      h2: {
+        fontSize: '32px',
+        fontWeight: 500,
+        lineHeight: '32px',
+        color: '#2C2535',
+      },
+      h3: {
+        fontSize: '24px',
+        lineHeight: 1,
+        fontWeight: 400,
+      },
+      h4: {
+        fontSize: '1.75rem',
+        lineHeight: 1.5,
+        letterSpacing: 0,
+        fontWeight: 400,
+      },
+      h5: {
+        fontSize: '1.5rem',
+        lineHeight: 1.5,
+        letterSpacing: 0,
+        fontWeight: 400,
+      },
+      h6: {
+        fontSize: '18px',
+        lineHeight: '20px',
+        letterSpacing: 0,
+        fontWeight: 400,
+        color: '#2C2535',
+      },
+      subtitle1: {
+        fontSize: '12px',
+        lineHeight: '18px',
+        fontWeight: 400,
+        color: '#908C97',
+      },
+      subtitle2: {
+        fontWeight: 500,
+        fontSize: '16px',
+        lineHeight: 1.25,
+      },
+      body1: {
+        fontSize: '1rem',
+        lineHeight: 1.5,
+        letterSpacing: 0,
+        fontWeight: 400,
+      },
+      body2: {
+        fontSize: '0.875rem',
+        lineHeight: 1.5,
+        letterSpacing: 0,
+        fontWeight: 400,
+      },
+      caption: {
+        color: '#908C97',
+        opacity: 0.7,
+        display: 'inline-block',
+        fontSize: '16px',
+        lineHeight: 1.5,
+        letterSpacing: 0,
+        fontWeight: 500,
+      },
+      overline: {
+        fontWeight: 400,
+        fontSize: '0.75rem',
+        lineHeight: 2.66,
+        textTransform: 'uppercase',
+      },
+      fontSize: {
+        'custom-small': '15px',
+      },
+      lineHeight: {
+        32: '32px',
       },
     },
     screens: {

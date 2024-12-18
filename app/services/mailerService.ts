@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
 const sendEmail = async (
   recipient: string,
   subject: string,
-  htmlContent: string,
+  htmlContent: string
 ): Promise<nodemailer.SentMessageInfo> => {
   const mailOptions = {
     from: `"Shaper" <${process.env.MAILER_EMAIL_FROM}>`,
@@ -41,7 +41,7 @@ const getTemplateTitle = (templateId: EmailTemplate): string => {
 const sendForgotPasswordEmail = async (
   recipient: string,
   token: string,
-  name?: string,
+  name?: string
 ): Promise<nodemailer.SentMessageInfo> => {
   const subject = getTemplateTitle(EmailTemplate.ForgotPassword);
   const resetLink = `${process.env.FRONTEND_HOST_URL}/reset-password?${stringify({ token })}`;
@@ -54,7 +54,7 @@ const sendForgotPasswordEmail = async (
 const sendVerificationEmail = async (
   recipient: string,
   code: string,
-  name: string,
+  name: string|null
 ): Promise<nodemailer.SentMessageInfo> => {
   const subject = getTemplateTitle(EmailTemplate.VerifyEmail);
   const htmlContent = `<p>Hi ${name},</p><p>Your verification code is: ${code}</p>`;

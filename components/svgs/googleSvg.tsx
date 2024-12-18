@@ -4,14 +4,25 @@ import { toast } from 'react-toastify';
 
 function GoogleSvg() {
   const loginWithGoogle = async () => {
-    try {
-      await signIn('google', { callbackUrl: '/admin' });
-    } catch (error) {
-      toast(error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.');
+    const response = await signIn('google', {
+      callbackUrl: '/admin',
+    });
+    console.log('Response', response);
+    if (!response) {
+      toast.error('Could not sign in');
+    }
+    if (response && !response.ok) {
+      toast.error('Could not sign in! You may have an account with same email');
     }
   };
   return (
-    <div role="button" tabIndex={0} aria-label="Svg" onKeyDown={() => console.log('pressed')} onClick={loginWithGoogle}>
+    <div
+      role="button"
+      tabIndex={0}
+      aria-label="Svg"
+      onKeyDown={() => console.log('pressed')}
+      onClick={loginWithGoogle}
+    >
       <svg
         className="w-6 h-6"
         viewBox="0 0 24 24"

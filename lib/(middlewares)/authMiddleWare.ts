@@ -10,15 +10,14 @@ export interface AuthenticatedRequest extends NextRequest {
   };
 }
 
-export function withAuth(handler: (req: AuthenticatedRequest) => Promise<NextResponse>) {
+export function withAuth(
+  handler: (req: AuthenticatedRequest) => Promise<NextResponse>
+) {
   return async (req: NextRequest) => {
     const session = await getServerSession(authOptions);
 
     if (!session?.user || !session.user.sub) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const authenticatedRequest = req as AuthenticatedRequest;

@@ -7,11 +7,21 @@ function FacebookSvg() {
     try {
       await signIn('facebook', { callbackUrl: '/admin' });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.');
+      toast.error(
+        error instanceof AuthError
+          ? error.message
+          : 'Could not sign in. Please try again.'
+      );
     }
   };
   return (
-    <div role="button" tabIndex={0} aria-label="Svg" onKeyDown={() => console.log('pressed')} onClick={loginWithFacebook}>
+    <div
+      role="button"
+      tabIndex={0}
+      aria-label="Svg"
+      // onKeyDown={() => console.log('pressed')}
+      onClick={loginWithFacebook}
+    >
       <svg
         className="w-6 h-6"
         viewBox="0 0 24 24"

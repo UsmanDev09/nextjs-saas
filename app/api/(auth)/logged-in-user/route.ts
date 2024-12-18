@@ -21,14 +21,11 @@ async function getLoggedInUser(req: AuthenticatedRequest) {
     if (error instanceof Error) {
       return NextResponse.json(
         { error: `Failed to get user: ${error.message}` },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
-    return NextResponse.json(
-      { error: 'Failed to get user' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Failed to get user' }, { status: 500 });
   }
 }
 export const GET = withAuth(getLoggedInUser);

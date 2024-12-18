@@ -5,8 +5,10 @@ import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { toast } from 'react-toastify';
 import GoogleProvider from 'next-auth/providers/google';
+import FacebookProvider from 'next-auth/providers/facebook';
+import LinkedInProvider from 'next-auth/providers/linkedin';
 
-console.log('RRR');
+// console.log('RRR');
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: {
@@ -20,6 +22,14 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_CLIENT_ID!,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
+    }),
+    LinkedInProvider({
+      clientId: process.env.AUTH_LINKEDIN_ID!,
+      clientSecret: process.env.AUTH_LINKEDIN_SECRET!,
     }),
     CredentialsProvider({
       name: 'Credentials',
@@ -59,41 +69,10 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             status: user.status,
           };
-        } catch (error: unknown) {
-          if (error instanceof Error) toast.error(error.message);
-          else toast.error('Failed to sign in');
+        } catch {
           return null;
         }
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, user, account }) {
-      console.log('token', token, user, account);
-
-      if (user) {
-        return {
-          ...token,
-          id: user.id,
-          username: user.username,
-          status: user.status,
-          sub: user.id,
-        };
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      console.log('SESSION');
-      return {
-        ...session,
-        user: {
-          ...session.user,
-          id: token.id as string,
-          username: token.username as string,
-          sub: token.sub as string,
-          status: token.status as string,
-        },
-      };
-    },
-  },
 };

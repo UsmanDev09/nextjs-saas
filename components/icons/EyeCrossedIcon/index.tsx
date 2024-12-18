@@ -8,7 +8,7 @@ function EyeCrossedIcon({
   fill = 'currentColor',
   direction = 'up',
   classes,
-} : ISvgProps) {
+}: ISvgProps) {
   const [iconClassName, setIconClassName] = useState('');
 
   useEffect(() => {

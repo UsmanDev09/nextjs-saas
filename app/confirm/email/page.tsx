@@ -4,15 +4,16 @@ interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined };
 }
 const confirmEmail = ({ searchParams }: PageProps) => {
-  const userId = searchParams.userId as string;
-  const token = searchParams.token as string;
-  // userid and token were hardcoded why?
-
+  const { userId } = searchParams;
+  const { token } = searchParams;
   return (
-    <EmailVerification
-      userId={userId}
-      token={token}
-    />
+    <div>
+      {userId && token ? (
+        <EmailVerification userId={userId as string} token={token as string} />
+      ) : (
+        <p>Invalid or missing parameters.</p>
+      )}
+    </div>
   );
 };
 export default confirmEmail;

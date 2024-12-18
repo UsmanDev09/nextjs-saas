@@ -17,7 +17,7 @@ export async function POST(req: Request) {
           unit_amount: product.price * 100,
         },
         quantity: product.quantity,
-      }),
+      })
     );
 
     const session = await stripe.checkout.sessions.create({
@@ -30,15 +30,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ url: session.url }, { status: 200 });
   } catch (error) {
     if (error instanceof Error) {
-      return NextResponse.json(
-        { error: `${error.message}` },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: `${error.message}` }, { status: 500 });
     }
 
     return NextResponse.json(
       { error: 'Something went wrong' },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

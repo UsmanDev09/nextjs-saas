@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error' >('idle');
+  const [status, setStatus] = useState<
+    'idle' | 'loading' | 'success' | 'error'
+  >('idle');
   const [message, setMessage] = useState('');
   const router = useRouter();
 
@@ -27,7 +29,7 @@ export default function ForgotPassword() {
       if (response.ok) {
         setStatus('success');
         setMessage(
-          'If an account exists for that email, we have sent password reset instructions.',
+          'If an account exists for that email, we have sent password reset instructions.'
         );
       } else {
         setStatus('error');
@@ -35,7 +37,9 @@ export default function ForgotPassword() {
       }
     } catch (error) {
       setStatus('error');
-      setMessage(error instanceof Error ? error.message : 'An unexpected error occured');
+      setMessage(
+        error instanceof Error ? error.message : 'An unexpected error occured'
+      );
     }
   };
 

@@ -8,8 +8,6 @@ export async function POST(req: NextRequest) {
   try {
     const { email, password } = await req.json();
 
-    console.log('reached here');
-
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email and password are required' },
@@ -44,8 +42,7 @@ export async function POST(req: NextRequest) {
         username,
         password: hashedPassword,
         userProfiles: {
-          create: {
-          },
+          create: {},
         },
       },
       select: {
@@ -73,7 +70,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       {
-        message: 'User created successfully. Please check your email to verify.',
+        message:
+          'User created successfully. Please check your email to verify.',
       },
       { status: 201 },
     );
@@ -85,9 +83,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json(
-      { error: 'Error signing up' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Error signing up' }, { status: 500 });
   }
 }

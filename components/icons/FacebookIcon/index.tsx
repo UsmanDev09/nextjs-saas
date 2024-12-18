@@ -9,7 +9,7 @@ function FacebookIcon({
   direction = 'up',
   className = '',
   ...rest
-} : ISvgProps) {
+}: ISvgProps) {
   return (
     <svg
       viewBox={viewBox}

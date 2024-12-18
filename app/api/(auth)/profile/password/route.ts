@@ -14,7 +14,7 @@ async function updateProfilePassword(req: AuthenticatedRequest) {
     if (!userId) {
       return NextResponse.json(
         { error: 'User not authenticated' },
-        { status: 401 },
+        { status: 401 }
       );
     }
     const userProfile = await prisma.user.findUnique({
@@ -38,13 +38,13 @@ async function updateProfilePassword(req: AuthenticatedRequest) {
     if (error instanceof Error) {
       return NextResponse.json(
         { error: `Failure to change password: ${error.message}` },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
     return NextResponse.json(
       { error: 'Failed to complete onboarding' },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

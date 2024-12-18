@@ -39,6 +39,7 @@
     "lucide-react": "^0.439.0",
     "nanoid": "^5.0.8",
     "next": "14.2.9",
+    "next-auth": "^4.24.11",
     "next-runtime-env": "^3.2.2",
     "nodemailer": "^6.9.15",
     "pg": "^8.13.0",
