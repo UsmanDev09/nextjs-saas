@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
 import NotificationsComponent from '@/app/notifications-page/page';
 import FriendsComponent from '@/app/friends-page/page';
-import { signOut, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { LogoutModal } from './logoutModal';
 
