@@ -6,7 +6,7 @@ function validateEmail(email: string) {
 }
 
 function validateConfirmEmailCode(code: string) {
-  return code && code.length >= 5;
+  return code && code.length >= 4;
 }
 
 function validateToken(token: string) {
@@ -32,14 +32,14 @@ export async function middleware(request: NextRequest) {
     const body = await request.json();
     const checkExtraFields = (allowedFields: string[]) => {
       const extraFields = Object.keys(body).filter(
-        (field) => !allowedFields.includes(field)
+        (field) => !allowedFields.includes(field),
       );
       if (extraFields.length > 0) {
         return NextResponse.json(
           {
             errors: [{ msg: `Unexpected field(s): ${extraFields.join(', ')}` }],
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
       return null;
@@ -58,21 +58,21 @@ export async function middleware(request: NextRequest) {
         if (!validateEmail(email)) {
           return NextResponse.json(
             { error: 'Invalid email format' },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
         if (!password || password.length < 8) {
           return NextResponse.json(
             { error: 'Password must be at least 8 characters long' },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
         if (password !== confirmPassword) {
           return NextResponse.json(
             { error: 'Passwords do not match' },
-            { status: 400 }
+            { status: 400 },
           );
         }
         break;
@@ -85,29 +85,29 @@ export async function middleware(request: NextRequest) {
         if (!email || !password) {
           return NextResponse.json(
             { error: 'Email and password are required' },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
         if (!validateEmail(email)) {
           return NextResponse.json(
             { error: 'Invalid email format' },
-            { status: 400 }
+            { status: 400 },
           );
         }
         break;
       }
       case '/api/confirm/email': {
-        const { code } = body;
-        const extraFieldsResponse = checkExtraFields(['code']);
+        const { userId, token } = body;
+        const extraFieldsResponse = checkExtraFields(['userId', 'token']);
         if (extraFieldsResponse) return extraFieldsResponse;
 
-        if (!validateConfirmEmailCode(code)) {
+        if (!validateConfirmEmailCode(token)) {
           return NextResponse.json(
             {
               errors: [{ msg: 'Code must be at least 5 characters long.' }],
             },
-            { status: 400 }
+            { status: 400 },
           );
         }
         break;
@@ -120,7 +120,7 @@ export async function middleware(request: NextRequest) {
         if (!validateEmail(email)) {
           return NextResponse.json(
             { error: 'Invalid email format' },
-            { status: 400 }
+            { status: 400 },
           );
         }
         break;
@@ -135,7 +135,7 @@ export async function middleware(request: NextRequest) {
             {
               errors: [{ msg: 'Token must be at least 5 characters long.' }],
             },
-            { status: 400 }
+            { status: 400 },
           );
         }
         if (!validatePassword(password)) {
@@ -143,7 +143,7 @@ export async function middleware(request: NextRequest) {
             {
               errors: [{ msg: 'Password must be at least 5 characters long.' }],
             },
-            { status: 400 }
+            { status: 400 },
           );
         }
         break;

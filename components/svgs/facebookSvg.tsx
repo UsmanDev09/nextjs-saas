@@ -8,9 +8,9 @@ function FacebookSvg() {
       await signIn('facebook', { callbackUrl: '/admin' });
     } catch (error) {
       toast.error(
-        error instanceof Error
+        error instanceof AuthError
           ? error.message
-          : 'An unexpected error occurred. Please try again.'
+          : 'Could not sign in. Please try again.'
       );
     }
   };

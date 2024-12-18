@@ -54,7 +54,7 @@ const sendForgotPasswordEmail = async (
 const sendVerificationEmail = async (
   recipient: string,
   code: string,
-  name: string
+  name: string|null
 ): Promise<nodemailer.SentMessageInfo> => {
   const subject = getTemplateTitle(EmailTemplate.VerifyEmail);
   const htmlContent = `<p>Hi ${name},</p><p>Your verification code is: ${code}</p>`;

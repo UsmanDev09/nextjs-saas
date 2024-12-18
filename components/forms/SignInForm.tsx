@@ -9,7 +9,6 @@ import {
   LockClosedIcon,
 } from '@heroicons/react/24/solid';
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
-import axios from 'axios';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
@@ -51,28 +50,17 @@ export default function SignInPage() {
         redirect: false,
       });
 
-      console.log('res', response);
-
       if (response?.ok) {
-        toast.success('Signin successfull');
-        router.push('onboarding-form');
+        router.push('/admin');
       } else {
-        const errorMessage = 'Invalid email or password';
-        toast.error(errorMessage);
+        console.log(response?.error);
+        toast('Credentials do not match!', { type: 'error' });
       }
-    } catch (error: unknown) {
-      let errorMessage;
-      if (axios.isAxiosError(error) && error.response) {
-        errorMessage = error.response.data.error || 'An error occurred';
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      } else {
-        errorMessage = 'An unexpected error occured';
-      }
-
-      toast.error(errorMessage);
-    } finally {
-      setSubmitting(false);
+    } catch (error) {
+      console.error('An unexpected error occurred:', error);
+      toast('An unexpected error occurred. Please try again later.', {
+        type: 'error',
+      });
     }
   };
 

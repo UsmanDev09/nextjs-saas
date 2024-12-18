@@ -13,10 +13,9 @@ export default function EmailVerification({
   token,
 }: EmailVerificationClientProps) {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
-    'loading'
+    'loading',
   );
   const [message, setMessage] = useState('');
-
   useEffect(() => {
     const verifyEmail = async () => {
       if (!userId || !token) {
@@ -24,7 +23,6 @@ export default function EmailVerification({
         setMessage('Invalid verification link');
         return;
       }
-
       try {
         const response = await fetch('/api/confirm/email', {
           method: 'POST',
@@ -33,7 +31,6 @@ export default function EmailVerification({
           },
           body: JSON.stringify({ userId, token }),
         });
-
         const data = await response.json();
 
         if (response.ok) {
@@ -45,7 +42,7 @@ export default function EmailVerification({
         toast.error(
           error instanceof Error
             ? error.message
-            : 'An error occurred while verifying your email'
+            : 'An error occurred while verifying your email',
         );
       }
     };
