@@ -123,7 +123,7 @@ const sendForgotPassword = async (
     });
 
     // Send reset email
-    await sendForgotPasswordEmail(user.email, token);
+    await sendForgotPasswordEmail(user.email, token, user.name);
 
     return { message: 'Reset Email sent successfully' };
   } catch (error) {

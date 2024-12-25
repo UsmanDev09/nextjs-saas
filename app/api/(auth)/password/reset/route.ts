@@ -1,26 +1,23 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import {
-  withAuth,
-  AuthenticatedRequest,
-} from '@/lib/(middlewares)/authMiddleWare';
 
-async function handlePasswordReset(req: AuthenticatedRequest) {
+export async function PUT(req: NextRequest) {
   try {
-    const { password } = await req.json();
-
-    if (!req.user || !req.user.sub) {
-      return NextResponse.json(
-        { error: 'User not authenticated' },
-        { status: 401 }
-      );
+    const { token, password } = await req.json();
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const user = await prisma.user.findUnique({
-      where: { id: req.user.sub },
+    const userId = await prisma.verificationToken.findFirst({
+      where: { token },
     });
 
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const user = await prisma.user.findUnique({
+      where: { id: userId.identifier },
+    });
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
@@ -33,21 +30,19 @@ async function handlePasswordReset(req: AuthenticatedRequest) {
 
     return NextResponse.json(
       { response: 'User password changed successfully' },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     if (error instanceof Error) {
       return NextResponse.json(
         { error: `Failed to reset password: ${error.message}` },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     return NextResponse.json(
       { error: 'Failed to reset password' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-
-export const PUT = withAuth(handlePasswordReset);

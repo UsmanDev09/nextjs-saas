@@ -1,16 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
+import {
+  ArrowRightOnRectangleIcon,
+  UserCircleIcon,
+} from '@heroicons/react/24/outline';
 import NotificationsComponent from '@/app/notifications-page/page';
 import FriendsComponent from '@/app/friends-page/page';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { LogoutModal } from './logoutModal';
+import { ProfileModal } from './profileModal';
 
 export default function Admin({ loggedInUser }: { loggedInUser: string }) {
   const [activeTab, setActiveTab] = useState('Week');
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const session = useSession();
   const router = useRouter();
 
@@ -19,9 +24,10 @@ export default function Admin({ loggedInUser }: { loggedInUser: string }) {
     <div className="flex min-h-screen bg-gray-100">
       {/* Left Sidebar */}
       <div className="w-20 bg-white shadow-md flex flex-col items-center py-6 space-y-8">
-        <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold">
-          1
-        </div>
+        <UserCircleIcon
+          className="w-12 h-12 text-primary cursor-pointer"
+          onClick={() => setShowProfileModal(true)}
+        />
         <NotificationsComponent />
         <div className="flex-grow" />
         <ArrowRightOnRectangleIcon
@@ -193,6 +199,11 @@ export default function Admin({ loggedInUser }: { loggedInUser: string }) {
       <LogoutModal
         isOpen={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}
+      />
+      <ProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+        loggedInUser={loggedInUser}
       />
     </div>
   );

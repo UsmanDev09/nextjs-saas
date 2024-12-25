@@ -27,13 +27,13 @@ export function ProfileModal({
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="flex items-center justify-center">
-            <Avatar className="h-24 w-24">
+            {/* <Avatar className="h-24 w-24">
               <AvatarImage
                 src={`https://api.dicebear.com/6.x/initials/svg?seed=${loggedInUser}`}
                 alt={loggedInUser}
               />
               <AvatarFallback>{loggedInUser.toUpperCase()}</AvatarFallback>
-            </Avatar>
+            </Avatar> */}
           </div>
           <div className="text-center">
             <h2 className="text-2xl font-bold">{loggedInUser}</h2>

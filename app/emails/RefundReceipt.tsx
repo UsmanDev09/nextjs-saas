@@ -63,7 +63,7 @@ export default function RefundReceipt({
               <strong>Refund ID:</strong> {refundId}
             </Text>
             <Text style={{ margin: '0 0 10px' }}>
-              <strong>Amount:</strong> ${(amount / 100).toFixed(2)}
+              <strong>Amount:</strong> ${amount}
             </Text>
             <Text style={{ margin: '0 0 10px' }}>
               <strong>Payment Intent ID:</strong> {paymentIntentId}

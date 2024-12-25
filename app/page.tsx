@@ -32,6 +32,12 @@ export default function Home() {
       </Link>
       <Link
         className="w-[30%] bg-purple-500 text-white py-3 rounded-xl font-semibold hover:bg-purple-600 transition duration-300 text-center"
+        href="/refund"
+      >
+        Go to Refund page
+      </Link>
+      <Link
+        className="w-[30%] bg-purple-500 text-white py-3 rounded-xl font-semibold hover:bg-purple-600 transition duration-300 text-center"
         href="/admin"
       >
         Go to Home page

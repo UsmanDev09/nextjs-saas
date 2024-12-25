@@ -32,7 +32,7 @@ const sendEmail = async (
       JSON.stringify({
         success: true,
         message: 'Email sent successfully!',
-        details: response, // Include details about the sent email
+        details: response,
       }),
       {
         status: 200,
@@ -55,7 +55,6 @@ const sendEmail = async (
     );
   }
 };
-
 // Get template title
 const getTemplateTitle = (templateId: EmailTemplate): string => {
   const titles: Record<EmailTemplate, string> = {
@@ -82,7 +81,7 @@ const sendForgotPasswordEmail = async (
 const sendVerificationEmail = async (
   recipient: string,
   code: string,
-  name: string|null,
+  name: string | null,
 ): Promise<nodemailer.SentMessageInfo> => {
   const subject = getTemplateTitle(EmailTemplate.VerifyEmail);
   const htmlContent = `<p>Hi ${name},</p><p>Your verification code is: ${code}</p>`;

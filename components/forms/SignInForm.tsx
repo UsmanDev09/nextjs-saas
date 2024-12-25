@@ -138,7 +138,7 @@ export default function SignInPage() {
         </Formik>
         <div className="text-center mt-4">
           <Link
-            href="/forgot-password"
+            href="/forgot/password"
             className="text-primary-700 hover:underline text-sm"
           >
             Forgot password?
