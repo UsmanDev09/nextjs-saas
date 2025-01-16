@@ -18,7 +18,7 @@ enum EmailTemplate {
 const sendEmail = async (
   recipient: string,
   subject: string,
-  htmlContent: string,
+  htmlContent: string
 ): Promise<Response> => {
   try {
     const response = await resend.emails.send({
@@ -37,7 +37,7 @@ const sendEmail = async (
       {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
-      },
+      }
     );
   } catch (error) {
     console.error('Failed to send email:', error);
@@ -46,12 +46,12 @@ const sendEmail = async (
       JSON.stringify({
         success: false,
         message: 'Failed to send email',
-        error: (error instanceof Error) ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
-      },
+      }
     );
   }
 };
@@ -68,7 +68,7 @@ const getTemplateTitle = (templateId: EmailTemplate): string => {
 const sendForgotPasswordEmail = async (
   recipient: string,
   token: string,
-  name?: string,
+  name?: string
 ): Promise<nodemailer.SentMessageInfo> => {
   const subject = getTemplateTitle(EmailTemplate.ForgotPassword);
   const resetLink = `${process.env.FRONTEND_HOST_URL}/reset-password?${stringify({ token })}`;
@@ -81,7 +81,7 @@ const sendForgotPasswordEmail = async (
 const sendVerificationEmail = async (
   recipient: string,
   code: string,
-  name: string | null,
+  name: string | null
 ): Promise<nodemailer.SentMessageInfo> => {
   const subject = getTemplateTitle(EmailTemplate.VerifyEmail);
   const htmlContent = `<p>Hi ${name},</p><p>Your verification code is: ${code}</p>`;

@@ -48,7 +48,9 @@ export async function POST(req: Request) {
       const charge = event.data.object as Stripe.Charge;
       const customerEmail = charge.billing_details?.email || charge.receipt_email;
       const refunds = await stripe.refunds.list({ charge: charge.id });
-      const mostRecentRefund = refunds.data.sort((a, b) => b.created - a.created)[0];
+      const mostRecentRefund = refunds.data.sort(
+        (a, b) => b.created - a.created,
+      )[0];
       if (mostRecentRefund && customerEmail) {
         await resend.emails.send({
           from: `SaaS <${process.env.DOMAIN_EMAIL}>`,
@@ -57,7 +59,7 @@ export async function POST(req: Request) {
           react: RefundReceipt({
             refundId: mostRecentRefund.id,
             amount: mostRecentRefund.amount / 100,
-            paymentIntentId: mostRecentRefund.payment_intent as string || '',
+            paymentIntentId: (mostRecentRefund.payment_intent as string) || '',
             reason: mostRecentRefund.reason || 'Customer request',
             customerEmail,
             date: new Date().toLocaleDateString(),

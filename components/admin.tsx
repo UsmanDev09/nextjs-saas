@@ -11,6 +11,8 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { LogoutModal } from './logoutModal';
 import { ProfileModal } from './profileModal';
+import { Dialog } from './ui/dialog';
+import { Tabs, TabsList, TabsTrigger } from './ui/tabs';
 
 export default function Admin({ loggedInUser }: { loggedInUser: string }) {
   const [activeTab, setActiveTab] = useState('Week');
@@ -138,22 +140,24 @@ export default function Admin({ loggedInUser }: { loggedInUser: string }) {
             <div className="bg-white rounded-lg p-6 shadow">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Skill Progress</h3>
-                <div className="flex space-x-2">
-                  {['Week', 'Month'].map((tab) => (
-                    <button
-                      type="button"
-                      key={tab}
-                      onClick={() => setActiveTab(tab)}
-                      className={`px-4 py-1 rounded-full text-sm font-medium ${
-                        activeTab === tab
-                          ? 'bg-purple-500 text-white'
-                          : 'text-gray-500 hover:bg-gray-100'
-                      }`}
-                    >
-                      {tab}
-                    </button>
-                  ))}
-                </div>
+                <Tabs defaultValue="Week" className="w-auto">
+                  <TabsList className="bg-transparent space-x-2">
+                    {['Week', 'Month'].map((tab) => (
+                      <TabsTrigger
+                        key={tab}
+                        value={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={`px-4 py-1 text-sm font-medium data-[state=active]:shadow-none ${
+                          activeTab === tab
+                            ? 'data-[state=active]:bg-purple-500 data-[state=active]:text-white rounded-s-full rounded-e-full'
+                            : 'text-gray-500 hover:bg-gray-100 hover:rounded-s-full rounded-e-full'
+                        }`}
+                      >
+                        {tab}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </Tabs>
               </div>
               <div className="space-y-4">
                 {['Adaptability', 'Time Management'].map((skill) => (

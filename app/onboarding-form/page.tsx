@@ -1,16 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  ChevronDownIcon,
-  UserIcon,
-  CalendarIcon,
-  ChevronLeftIcon,
-} from '@heroicons/react/24/outline';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { ChevronLeft, ChevronDown, User, Calendar } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Progress } from '@/components/ui/progress';
 
 interface FormData {
   name: string;
@@ -98,7 +103,6 @@ export default function OnboardingForm() {
   const handleNext = () => {
     let isStepValid = false;
 
-    // eslint-disable-next-line default-case
     switch (step) {
       case 1:
         isStepValid =
@@ -152,14 +156,14 @@ export default function OnboardingForm() {
         return (
           <>
             <div className="relative">
-              <UserIcon className="w-5 h-5 text-gray-400 absolute left-3 top-5 transform -translate-y-1/2 pointer-events-none" />
-              <input
+              <User className="w-5 h-5 text-gray-400 absolute left-3 top-5 transform -translate-y-1/2 pointer-events-none" />
+              <Input
                 type="text"
                 name="name"
                 value={formik.values.name}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="pl-10 pr-4 py-2 rounded-xl focus-visible:ring-purple-500"
                 placeholder="Full Name"
               />
               <div>
@@ -172,14 +176,14 @@ export default function OnboardingForm() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="relative">
-                <CalendarIcon className="w-5 h-5 text-gray-400 absolute left-3 top-5 transform -translate-y-1/2 pointer-events-none" />
-                <input
+                <Calendar className="w-5 h-5 text-gray-400 absolute left-3 top-5 transform -translate-y-1/2 pointer-events-none" />
+                <Input
                   type="number"
                   name="age"
                   value={formik.values.age}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="pl-10 pr-4 py-2 rounded-xl"
                   placeholder="Age"
                 />
                 <div>
@@ -191,19 +195,22 @@ export default function OnboardingForm() {
                 </div>
               </div>
               <div className="relative">
-                <select
+                <Select
                   name="gender"
                   value={formik.values.gender}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
+                  onValueChange={(value) =>
+                    formik.setFieldValue('gender', value)
+                  }
                 >
-                  <option value="">Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
-                <ChevronDownIcon className="w-5 h-5 text-gray-400 absolute right-3 top-5 transform -translate-y-1/2 pointer-events-none" />
+                  <SelectTrigger className="w-full px-4 py-2 rounded-xl">
+                    <SelectValue placeholder="Select Gender" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Female">Female</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
                 <div className="h-5 mt-1">
                   {formik.touched.gender && formik.errors.gender && (
                     <div className="text-red-500 text-sm">
@@ -218,23 +225,27 @@ export default function OnboardingForm() {
       case 2:
         return (
           <div>
-            <p className="text-gray-500 text-center mb-4">
+            <p className="text-gray-600 text-center mb-4">
               Choose three options
             </p>
             <div className="flex flex-wrap justify-center gap-2">
               {skills.map((skill) => (
-                <button
-                  type="button"
+                <Button
                   key={skill}
                   onClick={() => handleSkillToggle(skill)}
-                  className={`px-4 py-2 rounded-full text-sm ${
+                  variant={
+                    formik.values.importantSkills.includes(skill)
+                      ? 'default'
+                      : 'outline'
+                  }
+                  className={`rounded-full text-sm ${
                     formik.values.importantSkills.includes(skill)
                       ? 'bg-purple-500 text-white'
-                      : 'bg-gray-200 text-gray-700'
+                      : ''
                   }`}
                 >
                   {skill}
-                </button>
+                </Button>
               ))}
             </div>
             <div className="h-5 mt-2 text-center">
@@ -251,19 +262,24 @@ export default function OnboardingForm() {
         return (
           <div className="space-y-2">
             {categories.map((category) => (
-              <button
-                type="button"
+              <Button
                 key={category}
                 onClick={() => formik.setFieldValue('userCategory', category)}
-                className={`w-full text-left px-4 py-3 rounded-xl border ${
+                variant={
                   formik.values.userCategory === category
-                    ? 'border-purple-500 bg-purple-50'
-                    : 'border-gray-300'
+                    ? 'default'
+                    : 'outline'
+                }
+                className={`w-full justify-start px-4 py-3 rounded-xl ${
+                  formik.values.userCategory === category
+                    ? 'bg-purple-500 text-white'
+                    : ''
                 }`}
               >
                 {category}
-              </button>
+              </Button>
             ))}
+
             <div className="h-5 mt-2 text-center">
               {formik.touched.userCategory && formik.errors.userCategory && (
                 <div className="text-red-500 text-sm">
@@ -281,12 +297,7 @@ export default function OnboardingForm() {
   return (
     <div className="min-h-screen bg-purple-50 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md mb-8">
-        <div className="bg-gray-200 h-2 rounded-full">
-          <div
-            className="bg-purple-500 h-2 rounded-full transition-all duration-300 ease-in-out"
-            style={{ width: `${(step / steps.length) * 100}%` }}
-          />
-        </div>
+        <Progress value={(step / steps.length) * 100} className="h-2" />
       </div>
       <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md">
         <h1 className="text-2xl font-bold text-center mb-6">
@@ -294,31 +305,33 @@ export default function OnboardingForm() {
         </h1>
         <form onSubmit={formik.handleSubmit} className="space-y-6">
           {renderStep()}
-          <div className="flex justify-between">
+          <div className="flex justify-between gap-2">
             {step > 1 && (
-              <button
+              <Button
                 type="button"
                 onClick={handleBack}
-                className="px-4 py-2 bg-gray-200 rounded-full text-gray-700"
+                variant="outline"
+                size="icon"
+                className="rounded-full"
               >
-                <ChevronLeftIcon className="w-5 h-5" />
-              </button>
+                <ChevronLeft className="w-5 h-5" />
+              </Button>
             )}
             {step < steps.length ? (
-              <button
+              <Button
                 type="button"
                 onClick={handleNext}
-                className="w-full ml-auto px-6 py-2 bg-purple-500 text-white rounded-xl"
+                className="w-full ml-auto px-6 py-2 bg-purple-500 text-white rounded-xl hover:bg-purple-600"
               >
                 Next
-              </button>
+              </Button>
             ) : (
-              <button
+              <Button
                 type="submit"
-                className="w-full ml-auto px-6 py-2 bg-purple-500 text-white rounded-xl"
+                className="w-full ml-auto px-6 py-2 bg-purple-500 text-white rounded-xl hover:bg-purple-700"
               >
                 Submit
-              </button>
+              </Button>
             )}
           </div>
         </form>

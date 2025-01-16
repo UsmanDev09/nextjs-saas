@@ -30,19 +30,19 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(
       { response: 'User password changed successfully' },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     if (error instanceof Error) {
       return NextResponse.json(
         { error: `Failed to reset password: ${error.message}` },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
     return NextResponse.json(
       { error: 'Failed to reset password' },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

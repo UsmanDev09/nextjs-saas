@@ -1,9 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { Search } from 'lucide-react';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 interface Friend {
   id: string;
@@ -35,7 +38,6 @@ export default function FriendsComponent() {
 
       if (!accessToken) {
         toast.error('No access token found');
-
         return;
       }
 
@@ -70,54 +72,54 @@ export default function FriendsComponent() {
 
   return (
     <div>
-      {/* Friends Modal */}
       <div>
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-xl font-semibold">Friends</h2>
         </div>
         <div className="p-4">
-          <div className="flex space-x-4 mb-4">
-            {['All', 'Online', 'Global'].map((tab) => (
-              <button
-                type="button"
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 text-sm font-medium rounded-full ${
-                  activeTab === tab
-                    ? 'bg-purple-100 text-white'
-                    : 'text-gray-500 hover:bg-gray-100'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
+          <Tabs defaultValue="All" className="mb-4">
+            <TabsList className="bg-transparent space-x-4">
+              {['All', 'Online', 'Global'].map((tab) => (
+                <TabsTrigger
+                  key={tab}
+                  value={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-4 py-2 text-sm font-medium data-[state=active]:shadow-none ${
+                    activeTab === tab
+                      ? 'bg-purple-100 text-white rounded-s-full rounded-e-full'
+                      : 'text-gray-500 hover:bg-gray-100 hover:rounded-s-full rounded-e-full'
+                  }`}
+                >
+                  {tab}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+
           <div className="relative mb-4">
-            <input
+            <Input
               type="text"
               placeholder="Email or nick name..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full pl-10 pr-4 py-2 rounded-s-full rounded-e-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
-            <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+            <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
           </div>
+
           <div className="space-y-4">
             {filteredFriends.map((friend) => (
               <div key={friend.id} className="flex items-center space-x-3">
-                <div className="flex-shrink-0 w-10 h-10 bg-gray-200 rounded-full overflow-hidden">
-                  {friend.avatar?.path ? (
-                    <img
-                      src={friend.avatar.path}
-                      alt={friend.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-500">
-                      {friend.name.charAt(0)}
-                    </div>
-                  )}
-                </div>
+                <Avatar className="w-10 h-10 bg-gray-200">
+                  <AvatarImage
+                    src={friend.avatar?.path}
+                    alt={friend.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <AvatarFallback className="w-full h-full flex items-center justify-center text-gray-500">
+                    {friend.name.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
                 <div className="flex-grow">
                   <p className="font-medium">{friend.name}</p>
                   <p className="text-sm text-gray-500">@{friend.username}</p>

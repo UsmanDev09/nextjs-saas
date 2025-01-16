@@ -3,6 +3,16 @@
 import { useState } from 'react';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectItem,
+  SelectTrigger,
+  SelectContent,
+  SelectValue,
+} from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import * as yup from 'yup';
 
 const schema = yup.object().shape({
@@ -103,127 +113,137 @@ function RefundManager() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-lg border border-gray-200">
-        <div>
-          <h2 className="text-center text-3xl font-extrabold text-gray-900 mb-8">
+      <Card className="max-w-md w-full space-y-8 bg-white">
+        <CardHeader>
+          <CardTitle className="text-center text-3xl font-extrabold text-gray-900 mb-8">
             Process Refund
-          </h2>
-        </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleRefund} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Payment Intent ID
+              </label>
+              <Input
+                type="text"
+                value={paymentIntentId}
+                onChange={(e) => setPaymentIntentId(e.target.value)}
+                className={
+                  errors.paymentIntentId
+                    ? 'border-red-500'
+                    : 'focus-visible:ring-purple-500'
+                }
+                placeholder="pi_xxxxxxxxxxxxx"
+                required
+              />
+              {errors.paymentIntentId && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.paymentIntentId}
+                </p>
+              )}
+            </div>
 
-        <form onSubmit={handleRefund} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Payment Intent ID
-            </label>
-            <input
-              type="text"
-              value={paymentIntentId}
-              onChange={(e) => setPaymentIntentId(e.target.value)}
-              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
-                errors.paymentIntentId ? 'border-red-500' : 'border-gray-300'
-              }`}
-              placeholder="pi_xxxxxxxxxxxxx"
-              required
-            />
-            {errors.paymentIntentId && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.paymentIntentId}
-              </p>
-            )}
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Customer Email
+              </label>
+              <Input
+                type="email"
+                value={customerEmail}
+                onChange={(e) => setCustomerEmail(e.target.value)}
+                className={
+                  errors.customerEmail
+                    ? 'border-red-500'
+                    : 'focus-visible:ring-purple-500'
+                }
+                placeholder="customer@example.com"
+                required
+              />
+              {errors.customerEmail && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.customerEmail}
+                </p>
+              )}
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Customer Email
-            </label>
-            <input
-              type="email"
-              value={customerEmail}
-              onChange={(e) => setCustomerEmail(e.target.value)}
-              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
-                errors.customerEmail ? 'border-red-500' : 'border-gray-300'
-              }`}
-              placeholder="customer@example.com"
-              required
-            />
-            {errors.customerEmail && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.customerEmail}
-              </p>
-            )}
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Amount (in cents - optional)
+              </label>
+              <Input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className={
+                  errors.amount
+                    ? 'border-red-500'
+                    : 'focus-visible:ring-purple-500'
+                }
+                placeholder="Leave blank for full refund"
+              />
+              {errors.amount && (
+                <p className="mt-1 text-sm text-red-600">{errors.amount}</p>
+              )}
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Amount (in cents - optional)
-            </label>
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
-                errors.amount ? 'border-red-500' : 'border-gray-300'
-              }`}
-              placeholder="Leave blank for full refund"
-            />
-            {errors.amount && (
-              <p className="mt-1 text-sm text-red-600">{errors.amount}</p>
-            )}
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Reason
+              </label>
+              <Select
+                value={reason}
+                onValueChange={setReason}
+                className={
+                  errors.reason
+                    ? 'border-red-500'
+                    : 'focus-visible:ring-purple-500'
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a reason" />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  <SelectItem value="requested_by_customer">
+                    Requested by customer
+                  </SelectItem>
+                  <SelectItem value="duplicate">Duplicate</SelectItem>
+                  <SelectItem value="fraudulent">Fraudulent</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.reason && (
+                <p className="mt-1 text-sm text-red-600">{errors.reason}</p>
+              )}
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Reason
-            </label>
-            <select
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
-                errors.reason ? 'border-red-500' : 'border-gray-300'
-              }`}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-purple-600 text-white hover:bg-purple-700"
+              variant={loading ? 'disabled' : 'default'}
             >
-              <option value="requested_by_customer">
-                Requested by customer
-              </option>
-              <option value="duplicate">Duplicate</option>
-              <option value="fraudulent">Fraudulent</option>
-            </select>
-            {errors.reason && (
-              <p className="mt-1 text-sm text-red-600">{errors.reason}</p>
-            )}
-          </div>
+              {loading ? 'Processing...' : 'Process Refund'}
+            </Button>
+          </form>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full p-3 rounded-lg font-semibold transition duration-300 ${
-              loading
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-purple-500 hover:bg-purple-600 text-white'
-            }`}
-          >
-            {loading ? 'Processing...' : 'Process Refund'}
-          </button>
-        </form>
-
-        {status.type && (
-          <Alert
-            className={`mt-6 ${
-              status.type === 'success' ? 'bg-green-50' : 'bg-red-50'
-            }`}
-          >
-            {status.type === 'success' ? (
-              <CheckCircle className="h-4 w-4" />
-            ) : (
-              <AlertCircle className="h-4 w-4" />
-            )}
-            <AlertTitle>
-              {status.type === 'success' ? 'Success' : 'Error'}
-            </AlertTitle>
-            <AlertDescription>{status.message}</AlertDescription>
-          </Alert>
-        )}
-      </div>
+          {status.type && (
+            <Alert
+              className="mt-6"
+              variant={status.type === 'success' ? 'success' : 'error'}
+            >
+              {status.type === 'success' ? (
+                <CheckCircle className="h-4 w-4" />
+              ) : (
+                <AlertCircle className="h-4 w-4" />
+              )}
+              <AlertTitle>
+                {status.type === 'success' ? 'Success' : 'Error'}
+              </AlertTitle>
+              <AlertDescription>{status.message}</AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

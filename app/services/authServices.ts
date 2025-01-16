@@ -63,8 +63,8 @@ const sendVerifyEmail = async (userId: string) => {
     }
 
     if (
-      user.status === UserStatus.Verified
-      || user.status === UserStatus.Active
+      user.status === UserStatus.Verified ||
+      user.status === UserStatus.Active
     ) {
       return { message: 'Email verified' };
     }
@@ -86,7 +86,7 @@ const sendVerifyEmail = async (userId: string) => {
         await sendVerificationEmail(
           user.email,
           verificationToken.token,
-          user.username,
+          user.username
         );
       } else {
         return {
@@ -102,7 +102,7 @@ const sendVerifyEmail = async (userId: string) => {
 };
 
 const sendForgotPassword = async (
-  email: string,
+  email: string
 ): Promise<{ message: string }> => {
   try {
     const user = await prisma.user.findUnique({
